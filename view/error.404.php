@@ -8,7 +8,7 @@
 <div id="body">
 <h2>Page not found</h2>
 <?php if ($debug): ?>
-<h3><?= anchor() ?></h3>
+	<h3><?= path()->getAction() ?></h3>
 <?php endif; ?>
 </div>
 </body>

@@ -7,8 +7,8 @@
 </div>
 <div id="body">
 <h2>Internal server error</h2>
-<h3><?= $php_code ?> : <?= $php_message ?></h3>
 <?php if ($debug): ?>
+	<h3><?= $php_code ?> : <?= $php_message ?></h3>
 	<div id="backtrace">
 	<table>
 	<tr><th>&nbsp;</th><th>Call</th><th>File</th><th>Line</th></tr>
