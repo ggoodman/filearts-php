@@ -155,7 +155,9 @@ function handle_error($code, $message) {
 
 function handle_exception(Exception $e) {
 
-	handle_error($e->getCode(), $e->getMessage());
+	$code = ($e->getCode()) ? $e->getCode() : E_USER_ERROR;
+
+	handle_error($code, $e->getMessage());
 }
 
 function handle_request() {

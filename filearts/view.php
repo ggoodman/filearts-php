@@ -7,7 +7,7 @@ require_once 'view/section.php';
 
 class FAView {
 
-	static private $dirs = array('.');
+	static private $dirs = array();
 	
 	static public function render(FAPath $path, $context = array()) {
 	
@@ -21,9 +21,9 @@ class FAView {
 				break;
 			}
 		}
-	
+		
 		if (!file_exists($filename))
-			throw new Exception("View not found");
+			throw new Exception("View not found: $filename");
 			
 		defined('DEBUG') and $handler = set_error_handler(array('FAView', 'filterError'));
 			
@@ -69,7 +69,7 @@ function display_http_error($http_code, $http_message, $php_code = 0, $php_messa
 	
 	try {
 	
-		FAView::addPath('filearts/view');
+		FAView::addPath(dirname(__FILE__) . '/view');
 		FAView::render(path("error.$http_code"), $context);
 	} catch (Exception $e) {
 	
