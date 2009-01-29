@@ -36,7 +36,7 @@ function login_action($registry, $request, $response) {
 
 	$response->login_form = login_form($request);
 	
-	if ($request->method = 'POST') {
+	if ($request->method == 'POST') {
 	
 		if ($response->login_form->isValid($request->post)) {
 			
@@ -45,7 +45,7 @@ function login_action($registry, $request, $response) {
 			if ($user) {
 				
 				$request->session['user_id'] = $user->id;
-				redirect_to('index.index');
+				path('index.index')->redirectTo();
 			}
 			
 			$response->login_error = "Invalid username/password";

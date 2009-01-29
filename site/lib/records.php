@@ -32,7 +32,7 @@ class UserRecord extends FARecord {
 			$this->getSelectQuery()
 				->where('User.username=? AND User.password=?', array(
 					$credentials['username'],
-					$credentials['password'],
+					md5(SALT . $credentials['password']),
 				))
 		);
 		

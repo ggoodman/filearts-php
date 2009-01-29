@@ -31,7 +31,7 @@ class FAPath {
 	 */
 	public function __construct() {
 	
-		if (!isset(self::$_base)) self::init();
+		if (!isset(self::$_action)) self::init();
 	
 		$this->base = self::$_base;
 		$this->module = self::$_module;
@@ -55,18 +55,17 @@ class FAPath {
 		
 		if (isset($args['a'])) unset($args['a']);
 		
-		$path = $this->module . '/';
+		$path = '';
+		
+		if ($this->module) $path .= $this->module . '/';
 		
 		if ($this->controller != 'index' || $this->action != 'index') $path .= $this->controller . '.php';
 		if ($this->action != 'index') $args['a'] = $this->action;
 		if (!empty($args)) $path .= '?' . http_build_query($args, '');
 		if ($this->anchor) $path .= '#' . $this->anchor;
 		
-		if (!self::$based) $path = '/' . $this->base . '/' . $path;
-
-		$path = preg_replace('~^/|/+?(?=/)~', '', $path); //Strip excess '/'
-		
-		if (self::$abs) $path = 'http://' . $_SERVER['SERVER_NAME'] . '/' . $path;
+		if (self::$abs) $path = 'http://' . $_SERVER['SERVER_NAME'] . '/' . $this->base . '/' . $path;
+		elseif (!self::$based) $path = '/' . $this->base . '/' . $path;
 	
 		return $path;
 	}
@@ -94,29 +93,13 @@ class FAPath {
 	 * @static
 	 */
 	private static function init() {
+	
+		$root = preg_split("~/~", $_SERVER['DOCUMENT_ROOT'], -1, PREG_SPLIT_NO_EMPTY);
 		$actual = preg_split("~/~", dirname($_SERVER['PHP_SELF']), -1, PREG_SPLIT_NO_EMPTY);
-		$framework = explode(DIRECTORY_SEPARATOR, dirname(__FILE__));
-		$base = '/';
-		$module = '';
+		$site = preg_split("~/~", SITE_DIR, -1, PREG_SPLIT_NO_EMPTY);
 		
-		while (!empty($actual)) {
-			
-			if (strcasecmp(end($framework), end($actual)) == 0) {
-			
-				while (strcasecmp(end($framework), end($actual)) == 0) {
-					
-					$base = '/' . array_pop($actual) . $base;
-					array_pop($framework);
-				}
-				
-				break;
-			}
-			
-			$module =  '/' . array_pop($actual) . $module;
-		}
-		
-		self::$_base = $base;
-		self::$_module = $module;
+		self::$_base = implode('/', array_diff($site, $root));
+		self::$_module = implode('/', array_diff($actual, $site));
 		self::$_controller = basename($_SERVER['PHP_SELF'], '.php');
 		self::$_action = (isset($_GET['a']) ? $_GET['a'] : 'index');
 		
@@ -289,6 +272,47 @@ class FAPath {
 		$this->anchor = $anchor;
 		
 		return $this;
+	}
+	
+	public function redirectTo() {
+	
+		header('Location: ' . $this);
+		exit();
+	}
+	
+	public function getAncestors() {
+	
+		$ancestors = array();
+		$path = path('..');
+		
+		$ancestors[] = clone $path;
+		$sep = '';
+		
+		if ($this->getModule()) {
+		
+			foreach (explode('/', $this->getModule()) as $module) {
+			
+				$path->m($path->getModule() . $sep . $module);
+				
+				$ancestors[] = clone $path;
+				$sep = '/';
+			}
+		}
+
+		if ($this->getController() != 'index') $ancestors[] = clone $path->c($this->getController());
+		if ($this->getAction() != 'index') $ancestors[] = clone $path->a($this->getAction());
+				
+		return $ancestors;
+	}
+	
+	public function getTitle() {
+	
+		if ($this->getAction() != 'index') $title = $this->getAction();
+		else if ($this->getController() != 'index') $title = $this->getController();
+		else if ($this->getModule() == '') $title = 'home';
+		else $title = array_pop(explode('/', $this->getModule()));
+		
+		return str_replace('_', ' ', $title);
 	}
 }
 
