@@ -64,8 +64,8 @@ class FAPath {
 		if (!empty($args)) $path .= '?' . http_build_query($args, '');
 		if ($this->anchor) $path .= '#' . $this->anchor;
 		
-		if (self::$abs) $path = 'http://' . $_SERVER['SERVER_NAME'] . '/' . $this->base . '/' . $path;
-		elseif (!self::$based) $path = '/' . $this->base . '/' . $path;
+		if (self::$abs) $path = 'http://' . $_SERVER['SERVER_NAME'] . $this->base . $path;
+		elseif (!self::$based) $path = $this->base . $path;
 	
 		return $path;
 	}
@@ -94,14 +94,16 @@ class FAPath {
 	 */
 	private static function init() {
 	
-		$root = preg_split("~/~", $_SERVER['DOCUMENT_ROOT'], -1, PREG_SPLIT_NO_EMPTY);
-		$actual = preg_split("~/~", dirname($_SERVER['PHP_SELF']), -1, PREG_SPLIT_NO_EMPTY);
+		$root = preg_split("~/~", realpath($_SERVER['DOCUMENT_ROOT']), -1, PREG_SPLIT_NO_EMPTY);
+		$actual = preg_split("~/~", realpath(dirname($_SERVER['PHP_SELF'])), -1, PREG_SPLIT_NO_EMPTY);
 		$site = preg_split("~/~", SITE_DIR, -1, PREG_SPLIT_NO_EMPTY);
 		
 		self::$_base = implode('/', array_diff($site, $root));
 		self::$_module = implode('/', array_diff($actual, $site));
 		self::$_controller = basename($_SERVER['PHP_SELF'], '.php');
 		self::$_action = (isset($_GET['a']) ? $_GET['a'] : 'index');
+		
+		self::$_base = (self::$_base) ? '/' . self::$_base . '/' : '/';
 		
 		self::$_args = $_GET;
 	}
