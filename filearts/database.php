@@ -5,6 +5,11 @@ require_once 'database/resultset.php';
 require_once 'database/record.php';
 require_once 'database/recordset.php';
 
+function database($url) {
+
+	return FADatabaseConnection::connect($url);
+}
+
 abstract class FADatabaseConnection {
 
 	protected $tables = array();
@@ -12,6 +17,36 @@ abstract class FADatabaseConnection {
 	abstract public function quote($str);
 	abstract public function query($sql, $args = array());
 	abstract public function lastInsertId();
+	
+	static public function connect($url) {
+	
+		$defaults = array(
+			'scheme' => 'mysql',
+			'host' => 'localhost',
+			'user' => '',
+			'pass' => '',
+			'port' => '3306',
+			'db' => '',
+		);
+		$parsed_url = array_merge($defaults, parse_url($url));
+		
+		$scheme = $parsed_url['scheme'];
+		$host = $parsed_url['host'] . (($parsed_url['port']) ? ":{$parsed_url['port']}" : '');
+		$user = $parsed_url['user'];
+		$pass = $parsed_url['pass'];
+		$db = str_replace('/', '', $parsed_url['path']);
+		
+		$driver = dirname(__FILE__) . '/database/' . $scheme . '.php';
+		$class = 'FA' . $scheme . 'Connection';
+		
+		if (is_readable($driver)) {
+			require_once $driver;
+			
+			if (class_exists($class)) return new $class($host, $user, $pass, $db);
+		}
+		
+		throw new Exception("Unsupported Database: $scheme");
+	}
 	
 	public function mergeArguments($sql, $args = NULL) {
 	

@@ -47,6 +47,8 @@ class FARequest extends stdClass {
 		$this->module = path()->getModule();
 		$this->base_url = path()->getBase();
 		
+		$this->method = $_SERVER['REQUEST_METHOD'];
+		
 		$this->get = (get_magic_quotes_gpc()) ? stripslashes_deep($_GET) : $_GET;
 		$this->post = (get_magic_quotes_gpc()) ? stripslashes_deep($_POST) : $_POST;
 		$this->cookie = (get_magic_quotes_gpc()) ? stripslashes_deep($_COOKIE) : $_COOKIE;
@@ -125,7 +127,7 @@ function load_module() {
 
 function load_site() {
 
-	$base = dirname(__FILE__);
+	$base = dirname($_SERVER['SCRIPT_FILENAME']);
 	$filename = $base . '/site.init.php';
 	
 	if (file_exists($filename)) require $filename;
@@ -185,7 +187,5 @@ function handle_request() {
 	
 	ob_end_flush();
 }
-
-handle_request();
 
 ?>

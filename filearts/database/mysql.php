@@ -29,21 +29,7 @@ class FAMysqlConnection extends FADatabaseConnection {
 
 	private $link;
 
-	public function __construct($url) {
-	
-		$defaults = array(
-			'host' => '',
-			'user' => '',
-			'pass' => '',
-			'port' => '',
-			'db' => '',
-		);
-		$parsed_url = array_merge($defaults, parse_url($url));
-		
-		$host = $parsed_url['host'] . (($parsed_url['port']) ? ":{$parsed_url['port']}" : '');
-		$user = $parsed_url['user'];
-		$pass = $parsed_url['pass'];
-		$db = str_replace('/', '', $parsed_url['path']);
+	public function __construct($host, $user, $pass, $db) {
 		
 		$this->link = mysql_pconnect($host, $user, $pass);
 		

@@ -392,9 +392,13 @@ function path($parts = '', $path = NULL) {
 	return $path;
 }
 
-function anchor($parts = '') {
+function anchor($parts = '', $text = NULL) {
 
-	return path($parts, new FAAnchor);
+	$path = path($parts, new FAAnchor);
+	
+	is_null($text) or $path->text($text);
+	
+	return $path;
 }
 
 ?>

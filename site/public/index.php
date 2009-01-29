@@ -1,10 +1,9 @@
 <?php
 
-require_once '../../filearts/filearts.php';
+require_once '../lib/bootstrap.php';
 
 function index_action($registry, $request, $response) {
 
-	echo 'hello?';
 }
 
 ?>
