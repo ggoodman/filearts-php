@@ -213,10 +213,12 @@ abstract class FARecord extends FATable {
 	
 	public function findOrNew($key) {
 	
+		$record = $this->dba->__get($this->getClass());
+
+		if (!$key || (is_array($key) && empty($key))) return $record;
 		if (!is_array($key)) $key = array($key);
 		
 		$query = $this->getSelectQuery();
-		$record = $this->dba->__get($this->getClass());
 		$i = 0;
 		
 		foreach ($this->primaryKey as $name => $column) {

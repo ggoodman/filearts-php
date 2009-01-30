@@ -3,10 +3,20 @@
 <html>
 <head>
 <title><?= $title ?> - FileArts</title>
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/rte/jquery.rte.css" />
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.corners.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.tb.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.ocupload-1.1.4.js"></script>
 <script type="text/javascript">
 jQuery(function(){
+	$('.richedit').rte({
+		css: 'default.css',
+		width: '99%',
+		controls_rte: rte_toolbar,
+		controls_html: html_toolbar
+	});
 });
 </script>
 <style type="text/css">
@@ -112,7 +122,9 @@ a:hover {
 	background-color: #F0F0C0;
 	border-top: 1px solid #FFFFFF;
 	clear: both;
-	height: 60px;
+	height: 20px;
+	font-size: 9px;
+	line-height: 20px;
 	text-align: center;
 }
 </style>
@@ -136,8 +148,7 @@ a:hover {
 </div>
 <div id="body">
 <div id="sidebar">
-I'm in the sidebar<br />
-So am I
+<?php section_print('sidebar'); ?>
 </div>
 <div id="content">
 

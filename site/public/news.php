@@ -30,7 +30,7 @@ function article_form($request) {
 					array('type' => 'regex', 'value' => '/[^\s]/')
 				),
 			), array(
-				'type' => 'textarea',
+				'type' => 'richedit',
 				'name' => 'body',
 				'title' => 'The body of the article',
 				'label' => 'Body:',
@@ -78,7 +78,7 @@ function save_action($registry, $request, $response) {
 	$form = article_form($request);
 	
 	if ($form->isValid($request->post)) {
-		
+	
 		$article = $registry->dba->News->findOrNew($request->id)
 			->setArray($form->getValues())
 			->save();
