@@ -11,6 +11,7 @@ abstract class FATable {
 	protected $autoIncrement = '';
 	
 	protected $many = array();
+	protected $one = array();
 
 	abstract public function setTableDefinition();
 	
@@ -65,6 +66,17 @@ abstract class FATable {
 		$this->many[$name] = $options;
 	}
 	
+	public function hasOne($name, $options) {
+
+		$options = array_merge(array(
+			'record' => $name,
+			'local' => '',
+			'foreign' => '',
+		), $options);
+	
+		$this->one[$name] = $options;
+	}
+	
 	public function prepareSelect(FAQuery $query) {
 	}
 }
@@ -91,6 +103,14 @@ abstract class FARecord extends FATable {
 		if (isset($this->cache[$key])) return $this->cache[$key];
 		if (isset($this->dirty[$key])) return $this->dirty[$key];
 		if (isset($this->values[$key])) return $this->values[$key];
+		
+		if (isset($this->one[$key])) {
+
+			$table = $this->one[$key]['record'];
+			$this->cache[$key] = $this->dba->$table($this->__get($this->one[$key]['foreign']));
+			
+			return $this->cache[$key];
+		}
 		
 		if (isset($this->many[$key])) {
 		
@@ -243,7 +263,7 @@ abstract class FARecord extends FATable {
 		if ($this->isStored()) {
 		
 			$query = $this->dba->update($this->table)
-				->set($this->dirty);
+				->setAll($this->dirty);
 						
 			foreach ($this->primaryKey as $alias => $column) {
 				

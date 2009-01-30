@@ -7,6 +7,7 @@
 </div>
 <div id="body">
 <h2>Page not found</h2>
+<?= $php_message ?>
 <?php if ($debug): ?>
 	<h3><?= path()->getAction() ?></h3>
 <?php endif; ?>

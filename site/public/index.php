@@ -13,6 +13,9 @@ function page_init($registry, $request, $response) {
 function index_action($registry, $request, $response) {
 
 	$response->user = (isset($request->user)) ? $request->user->username : 'Guest';
+	$response->news = $registry->dba->News->findAll();
+	
+	paginate($response->news);
 }
 
 ?>

@@ -149,7 +149,7 @@ function handle_error($code, $message) {
 	if ($code & error_reporting()) {
 	
 		ob_clean();
-		display_http_error('500', "Internal server error", $code, $message);
+		display_http_error('500', $message, $code);
 	}
 }
 

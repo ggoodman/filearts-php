@@ -164,6 +164,11 @@ class FAPath {
 		return $this->module;
 	}
 	
+	public function arg($key, $value) {
+	
+		return $this->args(array($key => $value));
+	}
+	
 	/**
 	 * Chainable function to set arguments
 	 *
@@ -308,7 +313,7 @@ class FAPath {
 		}
 
 		if ($this->getController() != 'index') $ancestors[] = clone $path->c($this->getController());
-		if ($this->getAction() != 'index') $ancestors[] = clone $path->a($this->getAction());
+		//if ($this->getAction() != 'index') $ancestors[] = clone $path->a($this->getAction());
 				
 		return $ancestors;
 	}

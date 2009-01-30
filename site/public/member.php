@@ -17,6 +17,14 @@ function register_form($request) {
 					array('type' => 'regex', 'value' => '/[^\s]/')
 				),
 			), array(
+				'type' => 'text',
+				'name' => 'name',
+				'title' => 'Write your full name as you wish others to see',
+				'label' => 'Full Name:',
+				'validators' => array(
+					array('type' => 'regex', 'value' => '/[^\s]/')
+				),
+			), array(
 				'type' => 'password',
 				'name' => 'password',
 				'title' => 'Password',
@@ -37,6 +45,9 @@ function register_form($request) {
 				'value' => 'Register',
 			)
 		),
+		'validators' => array(
+			array('type' => 'equal', 'value' => array('password', 'confirm')),
+		),
 	));
 }
 
@@ -44,8 +55,7 @@ function create_action($registry, $request, $response) {
 	
 	$form = register_form($request);
 
-	if ($form->isValid($request->post) && 
-		$form->getValue('password') == $form->getValue('confirm')) {
+	if ($form->isValid($request->post)) {
 		
 		$values = $form->getValues();
 		$values['password'] = md5(SALT . $values['password']);

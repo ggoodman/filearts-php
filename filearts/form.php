@@ -5,21 +5,22 @@ class FAForm {
 	private $action;
 	private $method;
 	private $elements = array();
+	private $validators = array();
 	private $values = array();
 	private $invalid = array();
 	
 	public function __construct($form = array()) {
 		
-		$defaults = array(
+		$form = array_merge(array(
 			'action' => '',
 			'method' => 'post',
 			'elements' => array(),
-		);
-		
-		$form = array_merge($defaults, $form);
+			'validators' => array(),
+		), $form);
 		
 		$this->action = $form['action'];
 		$this->method = $form['method'];
+		$this->validators = $form['validators'];
 		
 		$this->addElements($form['elements']);
 	}
@@ -214,6 +215,24 @@ class FAForm {
 				} else {
 					$this->values[$name] = $value;
 				}
+			}
+		}
+		
+		$valid = TRUE;
+
+		foreach ($this->validators as $validator) {
+		
+			switch ($validator['type']) {
+				case 'equal':
+					$fields = $validator['value'];
+					$value = $this->getValue(array_pop($validator['value']));
+					
+					while (!empty($validator['value']))
+						$valid &= ($value == $this->getValue(array_pop($validator['value'])));
+						
+					if (!$valid) $this->invalid += $fields;
+						
+					break;
 			}
 		}
 		

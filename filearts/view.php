@@ -54,18 +54,22 @@ function render_view($filename, $context = array()) {
 	FAView::render($filename, $context);
 }
 
-function display_http_error($http_code, $http_message, $php_code = 0, $php_message = '') {
+function display_http_error($http_code, $php_message, $php_code = 0) {
+
+	$messages = array(
+		404 => "Not found",
+		500 => "Internal server error",
+	);
 
 	$context = array(
 		'http_code' => $http_code,
-		'http_message' => $http_message,
 		'debug' => defined('DEBUG'),
 		'php_code' => $php_code,
 		'php_message' => $php_message,
 		'php_backtrace' => debug_backtrace(),
 	);
 	
-	header("HTTP/1.0 $http_code $http_message");
+	header("HTTP/1.0 $http_code {$messages[$http_code]}");
 	
 	try {
 	

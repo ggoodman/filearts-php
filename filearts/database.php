@@ -4,6 +4,7 @@ require_once 'database/query.php';
 require_once 'database/resultset.php';
 require_once 'database/record.php';
 require_once 'database/recordset.php';
+require_once 'database/pager.php';
 
 function database($url) {
 

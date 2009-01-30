@@ -12,12 +12,16 @@ class UserRecord extends FARecord {
 			'autoIncrement' => TRUE,
 		));
 		$this->hasColumn('username', array(
-			'type' => 'string',
+			'type' => 'varchar',
 			'size' => 40,
 		));
 		$this->hasColumn('password', array(
-			'type' => 'string',
+			'type' => 'char',
 			'size' => 32,
+		));
+		$this->hasColumn('name', array(
+			'type' => 'varchar',
+			'size' => 60,
 		));
 	}
 	
@@ -37,6 +41,38 @@ class UserRecord extends FARecord {
 		);
 		
 		if ($matched->valid()) return $matched->current();
+	}
+}
+
+class NewsRecord extends FARecord {
+
+	public function setTableDefinition() {
+	
+		$this->setTableName('news');
+		
+		$this->hasColumn('id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+			'autoIncrement' => TRUE,
+		));
+		$this->hasColumn('user_id', array(
+			'type' => 'int',
+		));
+		$this->hasColumn('published', array(
+			'type' => 'date',
+		));
+		$this->hasColumn('title', array(
+			'type' => 'varchar',
+			'size' => 120,
+		));
+		$this->hasColumn('body', array(
+			'type' => 'text',
+		));
+		
+		$this->hasOne('user', array(
+			'local' => 'id',
+			'foreign' => 'user_id',
+		));
 	}
 }
 
