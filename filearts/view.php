@@ -28,7 +28,7 @@ class FAView {
 		defined('DEBUG') and $handler = set_error_handler(array('FAView', 'filterError'));
 			
 		call_user_func_array(
-			create_function('$f__,$a__', '$e__ = error_reporting(0);extract($a__, EXTR_SKIP);require($f__);error_reporting($e__);'),
+			create_function('$f__,$a__', '$e__ = error_reporting(E_ALL);extract($a__, EXTR_SKIP);require($f__);error_reporting($e__);'),
 			array($filename, $context)
 		);
 		

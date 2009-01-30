@@ -56,7 +56,7 @@ class FAMysqlConnection extends FADatabaseConnection {
 		//echo "SQL: $sql<br />\n";
 		if (is_resource($ret)) return new FAMysqlResultset($ret);
 		
-		if ($ret == FALSE) {echo "SQL: $sql<br />\n"; throw new Exception("Mysql error: " . mysql_error($this->link));}
+		if ($ret == FALSE) throw new FADatabaseException(mysql_error($this->link), mysql_errno($this->link));
 		
 		return mysql_affected_rows($this->link);
 	}

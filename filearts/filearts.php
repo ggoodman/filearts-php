@@ -181,7 +181,7 @@ function handle_request() {
 		
 	$handler($registry, $request, $response);
 	
-	FAView::render(path(), get_object_vars($response));
+	FAView::render(path()->a($response->view), get_object_vars($response));
 	
 	ob_end_flush();
 }

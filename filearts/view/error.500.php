@@ -27,5 +27,6 @@
 	</div>
 <?php endif; ?>
 </div>
+<?php section_print('debug'); ?>
 </body>
 </html>

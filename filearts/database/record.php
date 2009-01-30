@@ -8,6 +8,8 @@ abstract class FATable {
 	protected $columns = array();
 	protected $aliases = array();
 	
+	protected $autoIncrement = '';
+	
 	protected $many = array();
 
 	abstract public function setTableDefinition();
@@ -126,14 +128,13 @@ abstract class FARecord extends FATable {
 	
 	public function delete() {
 	
-		$query = $this->dba->deleteFrom($this->table);
+		$query = $this->dba->delete($this->table);
 	
 		foreach ($this->primaryKey as $column) {
 		
 			$name = $this->aliases[$column];
 			
-			$query->where($column . '=?');
-			$query->bind(array($this->$name));
+			$query->where($column . '=?', $this->__get($name));
 		}
 		
 		$query->execute();
@@ -257,36 +258,41 @@ abstract class FARecord extends FATable {
 		
 			$query = $this->dba->insert($this->table);
 			
+			if (isset($this->dirty[$this->autoIncrement]))
+				unset($this->dirty[$this->autoIncrement]);
+			
 			foreach ($this->dirty as $alias => $value) {
 			
-				if (isset($this->primaryKey[$alias])) {
-					
-					unset($this->dirty[$alias]);
-					continue;
-				}
-			
-				$query->set($this->columns[$alias]['column']);
+				$query->set($this->columns[$alias]['column'], $value);
 			}
 			
-			$query->values("?");
-			$query->bind(array(array_values($this->dirty)));
+			try {
+				$query->execute();
+			} catch (FADatabaseException $e) {
 			
-			$query->execute();
+				if ($e->getCode() == 1062) return FALSE;
+				
+				throw $e;
+			}
 			
+			if ($this->autoIncrement)
+				$this->dirty[$this->autoIncrement] = $this->dba->lastInsertId();
+				
 			$this->populate(array_merge(
 				$this->values,
-				$this->dirty,
-				array('id' => $this->dba->lastInsertId())
+				$this->dirty
 			));
 		}
 		
-		return TRUE;
+		return $this;
 	}
 	
 	public function setArray($values) {
 	
 		foreach ($values as $key => $value)
 			$this->__set($key, $value);
+			
+		return $this;
 	}
 	
 	public function toArray() {

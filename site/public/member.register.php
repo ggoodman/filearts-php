@@ -1,14 +1,14 @@
 <?php
-	$title = "Login";
+	$title = "Register";
 ?>
 
 <?php include('fragment.header.php'); ?>
 
-<?php if (isset($login_error)): ?>
+<?php if (isset($register_error)): ?>
 	<div class="form_error">
-	<?= $login_error ?>
+	<?= $register_error ?>
 	</div>
 <?php endif; ?>
-<?= $login_form ?>
+<?= $register_form ?>
 
 <?php include('fragment.footer.php'); ?>

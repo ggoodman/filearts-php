@@ -273,12 +273,10 @@ class FAInsertQuery extends FAQuery {
 		$this->select = $query;
 	}
 	
-	public function set($fragment, $args = NULL) {
+	public function set($key, $value) {
 	
-		is_null($args) or $fragment = $this->dba->mergeArguments($fragment, $args);
-		
-		$this->set[] = $fragment;
-		
+		$this->set[] = $this->dba->mergeArguments("$key=?", $value);
+			
 		return $this;
 	}
 	

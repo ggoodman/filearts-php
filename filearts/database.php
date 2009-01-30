@@ -10,6 +10,8 @@ function database($url) {
 	return FADatabaseConnection::connect($url);
 }
 
+class FADatabaseException extends Exception {}
+
 abstract class FADatabaseConnection {
 
 	protected $tables = array();
@@ -87,18 +89,18 @@ abstract class FADatabaseConnection {
 		}
 	}
 	
-	public function deleteFrom($table) {
+	public function delete($table) {
 	
 		$query = new FADeleteQuery($this);
 		
-		return $query->from($table);
+		return $query->table($table);
 	}
 	
-	public function insertInto($table) {
+	public function insert($table) {
 		
 		$query = new FAInsertQuery($this);
 		
-		return $query->from($table);
+		return $query->table($table);
 	}
 	
 	public function select($table) {
@@ -114,7 +116,7 @@ abstract class FADatabaseConnection {
 	
 		$query = new FAUpdateQuery($this);
 		
-		return $query->from($table);
+		return $query->table($table);
 	}
 	
 	public function __call($table, $key) {
