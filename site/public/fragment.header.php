@@ -92,7 +92,7 @@ a:hover {
 #content {
 	border-right: 1px solid #FFFFFF;
 	margin-right: 200px;
-	height: 100%;
+	padding: 0.5em;
 }
 #breadcrumbs {
 	padding: 4px 0 4px 1em;

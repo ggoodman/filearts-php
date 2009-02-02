@@ -144,12 +144,14 @@ function load_page() {
 	}
 }
 
-function handle_error($code, $message) {
+function handle_error($code, $message, $trace = NULL) {
 
 	if ($code & error_reporting()) {
 	
+		if (!is_array($trace)) $trace = debug_backtrace();
+	
 		ob_clean();
-		display_http_error('500', $message, $code);
+		display_http_error('500', $message, $code, $trace);
 	}
 }
 
@@ -157,7 +159,7 @@ function handle_exception(Exception $e) {
 
 	$code = ($e->getCode()) ? $e->getCode() : E_USER_ERROR;
 
-	handle_error($code, $e->getMessage());
+	handle_error($code, $e->getMessage(), $e->getTrace());
 }
 
 function handle_request() {

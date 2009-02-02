@@ -1,5 +1,5 @@
 <?php
-	$title = "Write an article";
+	$title = $article->title;
 ?>
 
 <?php include('fragment.header.php'); ?>
@@ -16,8 +16,34 @@ By <?= anchor('members.view')->arg('id', $article->user->id)->text($article->use
 	<?= anchor('news.delete')->arg('id', $article->id)->text("Delete") ?>
 <?php endif; ?>
 
-<h2>Comments</h2>
+<?php if ($article->comments->valid()): ?>
+	<hr />
+	<h2><? $article->num_comments ?> Comments</h2>
+	<ul>
+	<?php foreach ($article->comments as $comment): ?>
+		<li id="comment_<?= $comment->id ?>">
+		<cite><?= anchor('members.view')->arg('id', $comment->user->id)->text($comment->user->name) ?></cite>
+		<small><?= date("F j, Y \\a\\t g:i a", strtotime($comment->posted)) ?></small>
+		<div><?= $comment->body ?></div>
+		</li>
+	<?php endforeach; ?>
+	</ul>
+<?php else: ?>
+	<hr />
+	<h2>No Comments Yet</h2>
+<?php endif; ?>
 
-<?= $comment_form ?>
+<?php if ($visitor->isMember()): ?>
+	<hr />
+	<h2>Comment</h2>
+	<?= $comment_form ?>
+<?php else: ?>
+	<p>
+	<?= anchor('login.login')->backRef()->text("Login") ?>
+	or
+	<?= anchor('member.register')->backRef()->text("Register") ?>
+	to share your comments.
+	</p>
+<?php endif; ?>
 
 <?php include('fragment.footer.php'); ?>

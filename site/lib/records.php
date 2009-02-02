@@ -44,11 +44,11 @@ class UserRecord extends FARecord {
 	}
 }
 
-class NewsRecord extends FARecord {
+class ArticleRecord extends FARecord {
 
 	public function setTableDefinition() {
 	
-		$this->setTableName('news');
+		$this->setTableName('article');
 		
 		$this->hasColumn('id', array(
 			'type' => 'int',
@@ -72,6 +72,63 @@ class NewsRecord extends FARecord {
 		$this->hasOne('user', array(
 			'local' => 'id',
 			'foreign' => 'user_id',
+			'record' => 'User',
+			'prefetch' => TRUE,
+		));
+		
+		$this->hasMany('comments', array(
+			'record' => 'Comment',
+			'local' => 'id',
+			'foreign' => 'article_id',
+		));
+	}
+	
+	public function prepareSelect(FAQuery $query) {
+	
+		$query
+			->column("COUNT(Comment.id) as num_comments")
+			->leftJoin('comment Comment', 'Comment.article_id=Article.id')
+			->groupBy('Article.id');
+	}
+}
+
+class CommentRecord extends FARecord {
+
+	public function setTableDefinition() {
+	
+		$this->setTableName('comment');
+		
+		$this->hasColumn('id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+			'autoIncrement' => TRUE,
+		));
+		$this->hasColumn('user_id', array(
+			'type' => 'int',
+		));
+		$this->hasColumn('article_id', array(
+			'type' => 'int',
+		));
+		$this->hasColumn('parent_id', array(
+			'type' => 'int',
+		));
+		$this->hasColumn('posted', array(
+			'type' => 'date',
+		));
+		$this->hasColumn('body', array(
+			'type' => 'text',
+		));
+		
+		$this->hasOne('user', array(
+			'local' => 'id',
+			'foreign' => 'user_id',
+			'record' => 'User',
+			'prefetch' => TRUE,
+		));
+		
+		$this->hasOne('article', array(
+			'local' => 'id',
+			'foreign' => 'article_id',
 		));
 	}
 }

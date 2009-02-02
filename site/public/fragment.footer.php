@@ -5,4 +5,5 @@
 Copyright &copy; 2009, Geoffrey Goodman
 </div>
 </div>
+<?php section_print('debug'); ?>
 </html>

@@ -12,6 +12,8 @@ abstract class FATable {
 	
 	protected $many = array();
 	protected $one = array();
+	
+	protected $prefetch = array();
 
 	abstract public function setTableDefinition();
 	
@@ -72,7 +74,11 @@ abstract class FATable {
 			'record' => $name,
 			'local' => '',
 			'foreign' => '',
+			'prefetch' => FALSE,
 		), $options);
+		
+		if ($options['prefetch'])
+			$this->prefetch[$name] = $options;
 	
 		$this->one[$name] = $options;
 	}
@@ -84,6 +90,8 @@ abstract class FATable {
 abstract class FARecord extends FATable {
 
 	protected $dba;
+	
+	protected $query;
 	
 	protected $cache = array();
 	protected $dirty = array();
@@ -103,6 +111,24 @@ abstract class FARecord extends FATable {
 		if (isset($this->cache[$key])) return $this->cache[$key];
 		if (isset($this->dirty[$key])) return $this->dirty[$key];
 		if (isset($this->values[$key])) return $this->values[$key];
+		
+		if (isset($this->prefetch[$key])) {
+
+			$table = $this->one[$key]['record'];
+			$this->cache[$key] = $this->dba->$table;
+			
+			$values = array();
+			
+			foreach ($this->values as $alias => $value) {
+			
+				if (preg_match("/_{$table}_(?<key>.+)/", $alias, $matches))
+					$values[$matches['key']] = $value;
+			}
+			
+			$this->cache[$key]->populate($values);
+			
+			return $this->cache[$key];
+		}
 		
 		if (isset($this->one[$key])) {
 
@@ -170,22 +196,42 @@ abstract class FARecord extends FATable {
 		return new FARecordSet($query, $table);
 	}
 	
-	public function getSelectQuery() {
+	protected function addColumns(FAQuery $query, $prefix = '') {
 
-		$query = $this->dba->select($this->table . ' ' . $this->alias);
-		
 		foreach ($this->columns as $name => $options) {
 		
-			$query->column($this->alias . '.' . $options['column']);
+			$query->column($this->alias . '.' . $options['column'] . ' ' . $prefix . $options['column']);
+		}			
+	}
+	
+	public function getSelectQuery() {
+
+		if ($this->query == NULL) {
+		
+			$this->query = $this->dba->select($this->table . ' ' . $this->alias);
+			
+			$this->addColumns($this->query);
+			
+			foreach ($this->prefetch as $name => $options) {
+			
+				$class = $options['record'];
+				$record = $this->dba->$class;
+							
+				$this->query->join($record->getTableName() . " $class", $this->getAlias().'.'.$options['foreign']."=$name.".$options['local']);
+				
+				$record->addColumns($this->query, "_{$class}_");
+				$record->prepareSelect($this->query);
+			}
+			
+			$this->prepareSelect($this->query);
 		}
 		
-		$this->prepareSelect($query);
-		
-		return $query;
+		return clone $this->query;
 	}
 
 	public function find($key) {
 	
+		if (!$key || (is_array($key) && empty($key))) return NULL;
 		if (!is_array($key)) $key = array($key);
 		
 		$query = $this->getSelectQuery();
@@ -214,7 +260,7 @@ abstract class FARecord extends FATable {
 	public function findOrNew($key) {
 	
 		$record = $this->dba->__get($this->getClass());
-
+		
 		if (!$key || (is_array($key) && empty($key))) return $record;
 		if (!is_array($key)) $key = array($key);
 		
@@ -260,7 +306,7 @@ abstract class FARecord extends FATable {
 	
 	public function save() {
 	
-		if (!$this->isDirty()) return TRUE;
+		if (!$this->isDirty()) return $this;
 		
 		if ($this->isStored()) {
 		
@@ -282,7 +328,7 @@ abstract class FARecord extends FATable {
 			
 			if (isset($this->dirty[$this->autoIncrement]))
 				unset($this->dirty[$this->autoIncrement]);
-			
+				
 			foreach ($this->dirty as $alias => $value) {
 			
 				$query->set($this->columns[$alias]['column'], $value);

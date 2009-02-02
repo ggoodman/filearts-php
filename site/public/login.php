@@ -5,7 +5,7 @@ require_once '../lib/bootstrap.php';
 function login_form($request) {
 
 	return new FAForm(array(
-		'action' => path('login.login'),
+		'action' => path('login.login:ref'),
 		'method' => 'post',
 		'elements' => array(
 			array(
@@ -45,7 +45,9 @@ function login_action($registry, $request, $response) {
 			if ($user) {
 				
 				$request->session['user_id'] = $user->id;
-				path('index.index')->redirectTo();
+				
+				if (isset($request->ref)) FAPath::redirect($request->ref);
+				else path('index.index')->redirectTo();
 			}
 			
 			$response->login_error = "Invalid username/password";

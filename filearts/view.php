@@ -54,7 +54,7 @@ function render_view($filename, $context = array()) {
 	FAView::render($filename, $context);
 }
 
-function display_http_error($http_code, $php_message, $php_code = 0) {
+function display_http_error($http_code, $php_message, $php_code = 0, $trace = array()) {
 
 	$messages = array(
 		404 => "Not found",
@@ -66,7 +66,7 @@ function display_http_error($http_code, $php_message, $php_code = 0) {
 		'debug' => defined('DEBUG'),
 		'php_code' => $php_code,
 		'php_message' => $php_message,
-		'php_backtrace' => debug_backtrace(),
+		'php_backtrace' => $trace,
 	);
 	
 	header("HTTP/1.0 $http_code {$messages[$http_code]}");

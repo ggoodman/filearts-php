@@ -287,10 +287,15 @@ class FAPath {
 		return $this;
 	}
 	
+	static public function redirect($path) {
+	
+		header('Location: ' . $path);
+		exit();
+	}
+	
 	public function redirectTo() {
 	
-		header('Location: ' . $this);
-		exit();
+		self::redirect($this);
 	}
 	
 	public function getAncestors() {
@@ -381,6 +386,11 @@ class FAAnchor extends FAPath {
 		$this->title = $title;
 		
 		return $this;
+	}
+	
+	public function backRef() {
+		
+		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->__toString());
 	}
 }
 

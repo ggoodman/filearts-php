@@ -13,7 +13,7 @@
 	<div class="body"><?= $article->body ?></div>
 	<div class="feedback">
 	<?= anchor('news.view')->arg('id', $article->id)->anchor('comments')->text("Comments") ?>
-	(0)
+	(<?= $article->num_comments ?>)
 	</div>
 <?php endforeach; ?>
 
