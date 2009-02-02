@@ -217,7 +217,7 @@ abstract class FARecord extends FATable {
 				$class = $options['record'];
 				$record = $this->dba->$class;
 							
-				$this->query->join($record->getTableName() . " $class", $this->getAlias().'.'.$options['foreign']."=$name.".$options['local']);
+				$this->query->join($record->getTableName() . " $class", $this->getAlias().'.'.$options['foreign']."=$class.".$options['local']);
 				
 				$record->addColumns($this->query, "_{$class}_");
 				$record->prepareSelect($this->query);
