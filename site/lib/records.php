@@ -1,6 +1,6 @@
 <?php
 
-class UserRecord extends FARecord {
+class UserRecord extends FATable {
 
 	public function setTableDefinition() {
 	
@@ -44,7 +44,7 @@ class UserRecord extends FARecord {
 	}
 }
 
-class ArticleRecord extends FARecord {
+class ArticleRecord extends FATable {
 
 	public function setTableDefinition() {
 	
@@ -92,7 +92,7 @@ class ArticleRecord extends FARecord {
 	}
 }
 
-class CommentRecord extends FARecord {
+class CommentRecord extends FATable {
 
 	public function setTableDefinition() {
 	

@@ -1,5 +1,7 @@
 <?php
 
+define('STARTUP', array_sum(explode(' ', microtime())));
+
 error_reporting(E_ALL);
 set_error_handler('handle_error');
 set_exception_handler('handle_exception');

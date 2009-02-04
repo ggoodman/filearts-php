@@ -15,8 +15,6 @@ class FADatabaseException extends Exception {}
 
 abstract class FADatabaseConnection {
 
-	protected $tables = array();
-
 	abstract public function quote($str);
 	abstract public function query($sql, $args = array());
 	abstract public function lastInsertId();
@@ -45,7 +43,12 @@ abstract class FADatabaseConnection {
 		if (is_readable($driver)) {
 			require_once $driver;
 			
-			if (class_exists($class)) return new $class($host, $user, $pass, $db);
+			if (class_exists($class)) {
+				
+				$dba = new $class($host, $user, $pass, $db);
+								
+				return $dba;
+			}
 		}
 		
 		throw new Exception("Unsupported Database: $scheme");
@@ -118,31 +121,6 @@ abstract class FADatabaseConnection {
 		$query = new FAUpdateQuery($this);
 		
 		return $query->table($table);
-	}
-	
-	public function __call($table, $key) {
-	
-		return $this->createRecord($table)->find($key);
-	}
-	
-	public function __get($table) {
-	
-		return $this->createRecord($table);
-	}
-
-	protected function createRecord($table) {
-	
-		if (!isset($this->tables[$table])) {
-	
-			$class = $table . 'Record';
-			
-			if ($class == 'executeRecord') throw new Exception();
-			
-			$this->tables[$table] = new $class($this);
-			$this->tables[$table]->setTableDefinition();
-		}
-		
-		return clone $this->tables[$table];
 	}
 }
 

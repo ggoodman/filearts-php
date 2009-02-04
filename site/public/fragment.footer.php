@@ -1,9 +1,7 @@
 </div>
-<div style="clear: both;"></div>
-</div>
-<div id="footer" class="rounded">
+<div id="footer" class="wrap">
 Copyright &copy; 2009, Geoffrey Goodman
-</div>
+<?= (array_sum(explode(' ', microtime())) - STARTUP) ?>
 </div>
 <?php section_print('debug'); ?>
 </html>

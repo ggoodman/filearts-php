@@ -17,9 +17,9 @@ class FARecordSet extends FALazyProperty implements OuterIterator {
 	protected $query = NULL;
 	protected $original = NULL;
 	
-	public function __construct(FAQuery $query, FARecord $record) {
+	public function __construct(FATable $table, FAQuery $query) {
 		
-		$this->record = $record;
+		$this->table = $table;
 		$this->original = $query;
 		
 		$this->reset();
@@ -59,10 +59,10 @@ class FARecordSet extends FALazyProperty implements OuterIterator {
 	
 	public function current() {
 	
-		$record = clone $this->record;
-		$record->populate($this->iterator->current());
+		$entity = new FAEntity($this->table);
+		$entity->populate($this->iterator->current());
 		
-		return $record;
+		return $entity;
 	}
 
 	public function key() {

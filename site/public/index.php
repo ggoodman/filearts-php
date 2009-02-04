@@ -3,19 +3,13 @@
 require_once '../lib/bootstrap.php';
 
 function page_init($registry, $request, $response) {
-
-	if (isset($request->session['user_id'])) {
 	
-		$request->user = $registry->dba->User($request->session['user_id']);
-	}
+	$response->topnav['home']->addClass('current');
 }
 
 function index_action($registry, $request, $response) {
 
-	$response->user = (isset($request->user)) ? $request->user->username : 'Guest';
-	$response->news = $registry->dba->Article->findAll();
-	
-	paginate($response->news);
+	$response->news = paginate($registry->dba->findAll('Article'));
 }
 
 ?>

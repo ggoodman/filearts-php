@@ -2,6 +2,11 @@
 
 require_once '../lib/bootstrap.php';
 
+function page_init($registry, $request, $response) {
+	
+	$response->topnav['news']->addClass('current');
+}
+
 function article_form($request) {
 
 	return new FAForm(array(
@@ -97,7 +102,7 @@ function comment_action($registry, $request, $response) {
 	
 	if ($form->isValid($request->post)) {
 		
-		$comment = $registry->dba->Comment->findOrNew($form->id)
+		$comment = $registry->dba->findOrNew('Comment', $form->id)
 			->setArray($form->getValues())
 			->save();
 		
@@ -133,7 +138,9 @@ function edit_action($registry, $request, $response) {
 
 function index_action($registry, $request, $response) {
 
-	path('index.index')->redirectTo();
+	$response->news = $registry->dba->findAll('Article');
+	
+	paginate($response->news);
 }
 
 function save_action($registry, $request, $response) {
@@ -142,7 +149,7 @@ function save_action($registry, $request, $response) {
 	
 	if ($form->isValid($request->post)) {
 	
-		$article = $registry->dba->Article->findOrNew($request->id)
+		$article = $registry->dba->findOrNew('Article', $request->id)
 			->setArray($form->getValues())
 			->save();
 		

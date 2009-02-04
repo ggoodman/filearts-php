@@ -280,6 +280,14 @@ class FAInsertQuery extends FAQuery {
 		return $this;
 	}
 	
+	public function setAll($array) {
+	
+		foreach ($array as $key => $value)
+			$this->set($key, $value);
+			
+		return $this;
+	}
+	
 	public function where($fragment, $args = NULL) {
 	
 		is_null($args) or $fragment = $this->dba->mergeArguments($fragment, $args);

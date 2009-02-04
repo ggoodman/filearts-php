@@ -19,7 +19,7 @@ class Visitor {
 		return isset($this->user);
 	}
 	
-	public function setUser(FARecord $user) {
+	public function setUser(FAEntity $user) {
 	
 		$this->user = $user;
 	}

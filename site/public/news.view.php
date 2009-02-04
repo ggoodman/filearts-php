@@ -4,21 +4,15 @@
 
 <?php include('fragment.header.php'); ?>
 
-<h3><?= date("F j, Y", strtotime($article->published)) ?></h3>
-<h2><?= anchor('news.view')->arg('id', $article->id)->text($article->title) ?></h2>
-<div class="meta">
-By <?= anchor('members.view')->arg('id', $article->user->id)->text($article->user->name) ?>
-</div>
-<div class="body"><?= $article->body ?></div>
+<?php include('fragment.article.php'); ?>
 
 <?php if ($article->user->id == $visitor->id): ?>
 	<?= anchor('news.edit')->arg('id', $article->id)->text("Edit") ?>
 	<?= anchor('news.delete')->arg('id', $article->id)->text("Delete") ?>
 <?php endif; ?>
 
-<?php if ($article->comments->valid()): ?>
-	<hr />
-	<h2><? $article->num_comments ?> Comments</h2>
+<?php if ($article->comments->orderBy('Comment.posted DESC')->valid()): ?>
+	<h2 id="comments"><? $article->num_comments ?> Comments</h2>
 	<ul>
 	<?php foreach ($article->comments as $comment): ?>
 		<li id="comment_<?= $comment->id ?>">
@@ -29,13 +23,12 @@ By <?= anchor('members.view')->arg('id', $article->user->id)->text($article->use
 	<?php endforeach; ?>
 	</ul>
 <?php else: ?>
-	<hr />
-	<h2>No Comments Yet</h2>
+	<h2 id="comments">No Comments Yet</h2>
 <?php endif; ?>
 
 <?php if ($visitor->isMember()): ?>
 	<hr />
-	<h2>Comment</h2>
+	<h2>Respond</h2>
 	<?= $comment_form ?>
 <?php else: ?>
 	<p>

@@ -16,7 +16,7 @@ class FAMysqlResultset extends FADatabaseResultSet {
 	
 	public function fetch() {
 	
-		return mysql_fetch_array($this->result);
+		return mysql_fetch_array($this->result, MYSQL_ASSOC);
 	}
 
 	public function size() {
