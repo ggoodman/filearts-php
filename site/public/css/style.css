@@ -1,0 +1,128 @@
+body {
+	color:#555555;
+	font-family:"Lucida Grande",Verdana,"Bitstream Vera Sans",Arial,sans-serif;
+	line-height:22px;
+}
+a {
+	color:#21759B;
+	text-decoration: none;
+}
+a:hover {
+	color:#D54E21;
+}
+#header {
+	background-color: #464646;
+	height: 88px;
+	text-align: center;
+}
+#header h1 {
+	color: #FFFFFF;
+	bottom: -88px;
+	font-size: 60px;
+	line-height: 60px;
+	position: absolute;
+	left: 0px;
+}
+#user_panel {
+	color: #999999;
+	font-size: 12px;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+#topnav {
+	bottom: -88px;
+	position: absolute;
+	right: 0px;
+}
+#topnav a {
+	color: #999999;
+    margin-left: 1em;
+    float: left;
+    padding: 9px 4px 5px 4px;
+    text-decoration: none;
+}
+#topnav a:hover {
+	color: #FFFFFF;
+}
+#topnav a.current {
+	color: #555555;
+	background-color: #E4F2FD;
+    padding: 9px 8px 5px 8px;
+	-moz-border-radius-topleft:4px;
+	-moz-border-radius-topright:4px;
+}
+a#download {
+	color: #FFFFFF;
+	background-color: #D54E21;
+	-moz-border-radius-topleft:4px;
+	-moz-border-radius-topright:4px;
+}
+a#download:hover {
+	color: #FFAC90;
+}
+#subhead {
+	background-color: #E4F2FD;
+	border-bottom: 1px solid #C6D9E9;
+	height: auto !important;
+	height: 20px;
+	min-height: 20px;
+	padding: 10px;
+	overflow: auto;
+}
+#subhead h2 {
+	color: #555555;
+	font-family: Georgia, Times, "Times New Roman", serif;
+	font-size: 36px;
+	font-style: italic;
+	line-height: 1em;
+	padding-left: 12px;
+	padding-top: 10px;
+	text-shadow:0 1px 0 #E4F2FD;
+}
+#subhead p {
+	line-height: 22px;
+	font-size: 13px;
+}
+#subhead p.intro {
+	font-family: Georgia, Times, "Times New Roman", serif;
+	font-size: 17px;
+	line-height: 1.5em;
+}
+#footer {
+	border-top: 1px solid #CCCCCC;
+}
+.wrap {
+	width: 800px;
+	margin: 0 auto;
+	position: relative;
+	text-align: left;
+}
+
+h3.date {
+	color: #666666;
+	font-size: 10px;
+	margin: 8px 0 0 0;
+}
+h2 {
+	font-size: 18px;
+	padding: 10px 0;
+}
+.meta {
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	font-size: 10px;
+}
+.body {
+	margin-bottom: 14px;
+	font-size: 12px;
+}
+.body p {
+	padding-bottom: 6px;
+}
+.feedback {
+	text-align: right;
+	border-bottom: 1px solid #CCCCCC;
+	font-size: 10px;
+	margin-top: -10px;
+	margin-bottom: 30px;
+}
