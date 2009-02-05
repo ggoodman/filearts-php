@@ -126,3 +126,7 @@ h2 {
 	margin-top: -10px;
 	margin-bottom: 30px;
 }
+textarea {
+	width: 99%;
+	height: 200px;
+}

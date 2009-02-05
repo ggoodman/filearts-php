@@ -35,7 +35,7 @@ function article_form($request) {
 					array('type' => 'regex', 'value' => '/[^\s]/')
 				),
 			), array(
-				'type' => 'richedit',
+				'type' => 'textarea',
 				'name' => 'body',
 				'title' => 'The body of the article',
 				'label' => 'Body:',
@@ -120,6 +120,8 @@ function delete_action($registry, $request, $response) {
 	if (!$response->article) display_http_error(404, "Article not found");
 
 	if (isset($request->confirm)) {
+	
+		var_dump($response->article);
 	
 		$registry->dba->Article($request->id)->delete();
 		path('index.index')->redirectTo();

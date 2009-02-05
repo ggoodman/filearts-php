@@ -59,7 +59,9 @@ class FARecordSet extends FALazyProperty implements OuterIterator {
 	
 	public function current() {
 	
-		$entity = new FAEntity($this->table);
+		$class = $this->table->getTableAlias();
+
+		$entity = new $class;
 		$entity->populate($this->iterator->current());
 		
 		return $entity;

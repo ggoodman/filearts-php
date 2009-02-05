@@ -30,6 +30,7 @@ var	rte_toolbar = {
 <select>\
 	<option value="">- style -</option>\
 	<option value="<p>">Paragraph</option>\
+	<option value="<code>">Preformatted Text</option>\
 	<option value="<h1>">Header 1</option>\
 	<option value="<h2>">Header 2</options>\
 	<option value="<h3>">Header 3</option>\
@@ -42,7 +43,7 @@ var	rte_toolbar = {
 			arg = arg.replace(/<([^>]*)>/, '$1');
 			return (arg.toLowerCase() == node.nodeName.toLowerCase());
 		}
-	, tags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']},
+	, tags: ['p', 'code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']},
 	font			: {command: 'fontname', select: '\
 <select>\
 	<option value="">- font -</option>\

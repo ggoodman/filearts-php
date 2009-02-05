@@ -6,8 +6,14 @@
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/reset.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/style.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/rte/jquery.rte.css" />
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shCore.css"/>
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shThemeDefault.css"/>
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.corners.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shCore.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushPhp.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushXml.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/jquery.code.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.tb.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.ocupload-1.1.4.js"></script>
@@ -19,6 +25,10 @@ jQuery(function(){
 		controls_rte: rte_toolbar,
 		controls_html: html_toolbar
 	});
+	$("pre code").addClass("brush: php");
+	SyntaxHighlighter.config['tagName'] = "code";
+	SyntaxHighlighter.defaults['html-script'] = true;
+	SyntaxHighlighter.all();
 });
 </script>
 </head>

@@ -8,6 +8,7 @@ require_once dirname(__FILE__) . '/../../filearts/filearts.php';
 
 require 'records.php';
 require 'visitor.php';
+require 'markdown.php';
 
 handle_request();
 

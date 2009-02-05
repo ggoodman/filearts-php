@@ -1,136 +1,137 @@
 <?php
 
-class UserRecord extends FATable {
+class User extends FAEntity {
 
-	public function setTableDefinition() {
-	
-		$this->setTableName('user');
-		
-		$this->hasColumn('id', array(
-			'type' => 'int',
-			'primary' => TRUE,
-			'autoIncrement' => TRUE,
-		));
-		$this->hasColumn('username', array(
-			'type' => 'varchar',
-			'size' => 40,
-		));
-		$this->hasColumn('password', array(
-			'type' => 'char',
-			'size' => 32,
-		));
-		$this->hasColumn('name', array(
-			'type' => 'varchar',
-			'size' => 60,
-		));
-	}
-	
+	protected $tableDef = array(
+		'table' => 'user',
+		'columns' => array(
+			'id' => array(
+				'type' => 'int',
+				'primary' => TRUE,
+				'autoIncrement' => TRUE,
+			),
+			'username' => array(
+				'type' => 'varchar',
+				'size' => 40,
+			),
+			'password' => array(
+				'type' => 'char',
+				'size' => 32,
+			),
+			'name' => array(
+				'type' => 'varchar',
+				'size' => 60,
+			),
+		),
+	);
+
 	public function verify($credentials = array()) {
-
+	
 		$credentials = array_merge(array(
-			'user' => NULL,
-			'pass' => NULL,
+			'username' => NULL,
+			'password' => NULL,
 		), $credentials);
 		
-		$matched = $this->getJoinedRecords($this,
-			$this->getSelectQuery()
-				->where('User.username=? AND User.password=?', array(
-					$credentials['username'],
-					md5(SALT . $credentials['password']),
-				))
+		$matched = FAPersistence::getInstance()->findAll('User')
+			->where('User.username=? AND User.password=?', array(
+				$credentials['username'],
+				md5(SALT . $credentials['password']),
+			)
 		);
 		
 		if ($matched->valid()) return $matched->current();
 	}
 }
 
-class ArticleRecord extends FATable {
+class Article extends FAEntity {
 
-	public function setTableDefinition() {
-	
-		$this->setTableName('article');
-		
-		$this->hasColumn('id', array(
-			'type' => 'int',
-			'primary' => TRUE,
-			'autoIncrement' => TRUE,
-		));
-		$this->hasColumn('user_id', array(
-			'type' => 'int',
-		));
-		$this->hasColumn('published', array(
-			'type' => 'date',
-		));
-		$this->hasColumn('title', array(
-			'type' => 'varchar',
-			'size' => 120,
-		));
-		$this->hasColumn('body', array(
-			'type' => 'text',
-		));
-		
-		$this->hasOne('user', array(
-			'local' => 'id',
-			'foreign' => 'user_id',
-			'record' => 'User',
-			'prefetch' => TRUE,
-		));
-		
-		$this->hasMany('comments', array(
-			'record' => 'Comment',
-			'local' => 'id',
-			'foreign' => 'article_id',
-		));
-	}
+	protected $tableDef = array(
+		'table' => 'article',
+		'columns' => array(
+			'id' => array(
+				'type' => 'int',
+				'primary' => TRUE,
+				'autoIncrement' => TRUE,
+			),
+			'user_id' => array(
+				'type' => 'int',
+			),
+			'published' => array(
+				'type' => 'date',
+			),
+			'title' => array(
+				'type' => 'varchar',
+				'size' => 120,
+			),
+			'body' => array(
+				'type' => 'text',
+			),
+		),
+		'hasOne' => array(
+			'user' => array(
+				'local' => 'id',
+				'foreign' => 'user_id',
+				'record' => 'User',
+				'prefetch' => TRUE,
+			),
+		),
+		'hasMany' => array(
+			'comments' => array(
+				'record' => 'Comment',
+				'local' => 'id',
+				'foreign' => 'article_id',
+			),
+		),
+	);
 	
 	public function prepareSelect(FAQuery $query) {
 	
-		$query
+		return $query
 			->column("COUNT(Comment.id) as num_comments")
 			->leftJoin('comment Comment', 'Comment.article_id=Article.id')
 			->groupBy('Article.id');
 	}
 }
 
-class CommentRecord extends FATable {
+class Comment extends FAEntity {
 
-	public function setTableDefinition() {
-	
-		$this->setTableName('comment');
-		
-		$this->hasColumn('id', array(
-			'type' => 'int',
-			'primary' => TRUE,
-			'autoIncrement' => TRUE,
-		));
-		$this->hasColumn('user_id', array(
-			'type' => 'int',
-		));
-		$this->hasColumn('article_id', array(
-			'type' => 'int',
-		));
-		$this->hasColumn('parent_id', array(
-			'type' => 'int',
-		));
-		$this->hasColumn('posted', array(
-			'type' => 'date',
-		));
-		$this->hasColumn('body', array(
-			'type' => 'text',
-		));
-		
-		$this->hasOne('user', array(
-			'local' => 'id',
-			'foreign' => 'user_id',
-			'record' => 'User',
-			'prefetch' => TRUE,
-		));
-		
-		$this->hasOne('article', array(
-			'local' => 'id',
-			'foreign' => 'article_id',
-		));
-	}
+	protected $tableDef = array(
+		'table' => 'comment',
+		'columns' => array(
+			'id' => array(
+				'type' => 'int',
+				'primary' => TRUE,
+				'autoIncrement' => TRUE,
+			),
+			'user_id' => array(
+				'type' => 'int',
+			),
+			'article_id' => array(
+				'type' => 'int',
+			),
+			'parent_id' => array(
+				'type' => 'int',
+			),
+			'posted' => array(
+				'type' => 'date',
+			),
+			'body' => array(
+				'type' => 'text',
+			),
+		),
+		'hasOne' => array(
+			'user' => array(
+				'local' => 'id',
+				'foreign' => 'user_id',
+				'record' => 'User',
+				'prefetch' => TRUE,
+			),
+			'article' => array(
+				'local' => 'id',
+				'foreign' => 'article_id',
+			),
+		),
+	);
 }
 
 ?>

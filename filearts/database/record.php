@@ -22,6 +22,11 @@ class FAPersistence {
 		return (self::$instance = new FAPersistence($dba));
 	}
 	
+	static public function init($url) {
+	
+		return self::connect(database($url));
+	}
+	
 	protected $dba;
 	
 	protected $records = array();
@@ -45,14 +50,14 @@ class FAPersistence {
 		return $entity->find();
 	}
 	
-	public function __get($alias) {
+	public function __get($class) {
 	
-		return new FAEntity(FATable::getInstance($alias));
+		return new $class;
 	}
 	
 	public function findAll($alias) {
-		
-		$table = FATable::getInstance($alias);
+	
+		$table = $this->__get($alias)->getTable();
 		$query = $table->getSelectQuery();
 		
 		return new FARecordSet($table, $query);
@@ -80,11 +85,21 @@ class FAEntity {
 	protected $stored = FALSE;
 	
 	protected $cache = array();
-
-	public function __construct(FATable $table) {
 	
-		$this->table = $table;
-		$this->record = new FARecord;
+	protected $tableDef = array();
+	protected static $tableDefs = array();
+
+	public function __construct($values = array()) {
+	
+		$class = get_class($this);
+	
+		if (!isset(self::$tableDefs[$class])) {
+		
+			self::$tableDefs[$class] = new FATable($this, $this->tableDef);
+		}
+		
+		$this->table = self::$tableDefs[$class];
+		$this->record = new FARecord($values);
 	}
 
 	public function __get($key) {
@@ -117,6 +132,8 @@ class FAEntity {
 			$this->record->setMeta($key, $value);
 		}
 	}
+	
+	public function prepareSelect(FAQuery $query) { return $query; }
 	
 	public function set($key, $value) {
 	
@@ -151,6 +168,8 @@ class FAEntity {
 		if ($record = &FARecord::getRecord($id)) {
 		
 			$this->setRecord($record);
+			
+			$this->stored = TRUE;
 		} else {
 		
 			$result = $query->execute();
@@ -200,15 +219,37 @@ class FAEntity {
 		
 		foreach ($this->table->getPrefetch() as $name => $options) {
 		
-			$table = FATable::getInstance($options['record']);
+			$class = $options['record'];
 			
-			$this->$name = new FAEntity(FATable::getInstance($options['record']));
+			$this->$name = new $class;		
 			$this->$name->populate($prefetch[$name]);
 		}
 		
 		$this->stored = TRUE;
 		
 		return $this;
+	}
+	
+	public function delete() {
+	
+		if ($this->isStored()) {
+		
+			$query = $this->table->getDeleteQuery();
+			
+			foreach ($this->table->getPrimaryKey() as $name => $column) {
+			
+				$query->where("$name=?", $this->record[$name]);
+			}
+			
+			$query->execute();
+			
+			// Flush the dirty cache to clean
+			$this->record = new FARecord;
+			
+		} else {
+		
+			$this->record = new FARecord;
+		}
 	}
 	
 	public function save() {
@@ -351,8 +392,9 @@ class FARecord implements ArrayAccess, IteratorAggregate {
 	}
 }
 
-abstract class FATable {
+class FATable {
 
+	protected $alias;
 	protected $table;
 	
 	protected $primaryKey = array();
@@ -368,22 +410,31 @@ abstract class FATable {
 	
 	protected $query;
 	
-	static private $instances = array();
+	public function __construct(FAEntity $entity, $tableDef = array()) {
 	
-	static public function getInstance($table) {
+		$this->alias = get_class($entity);
+	
+		$tableDef = array_merge(array(
+			'table' => '',
+			'columns' => array(),
+			'hasOne' => array(),
+			'hasMany' => array(),
+		), $tableDef);
 		
-		if (!isset(self::$instances[$table])) {
+		$this->setTableName($tableDef['table']);
 		
-			$class = $table . 'Record';
-			self::$instances[$table] = new $class;
-			self::$instances[$table]->setTableDefinition();
-		}
-		
-		return self::$instances[$table];
-	}
+		foreach ($tableDef['columns'] as $name => $options) $this->hasColumn($name, $options);
+		foreach ($tableDef['hasOne'] as $name => $options) $this->hasOne($name, $options);
+		foreach ($tableDef['hasMany'] as $name => $options) $this->hasMany($name, $options);
 
-	abstract public function setTableDefinition();
-	
+		$this->query = FAPersistence::getDatabase()->select($this->table . ' ' . $this->getTableAlias());
+		
+		$this->addSelectColumns($this->query);
+		$this->addPrefetchRecords($this->query);
+		
+		$this->query = $entity->prepareSelect($this->query);
+	}
+		
 	public function getColumns() {
 	
 		return $this->columns;
@@ -401,7 +452,7 @@ abstract class FATable {
 	
 	public function getTableAlias() {
 	
-		return substr(get_class($this), 0, -6);
+		return $this->alias;
 	}
 	
 	public function getTableName() {
@@ -473,12 +524,13 @@ abstract class FATable {
 		foreach ($this->prefetch as $name => $options) {
 		
 			$class = $options['record'];
-			$table = FATable::getInstance($class);
-						
+			$entity = new $class;
+			$table = $entity->getTable();
+			
 			$this->query->join($table->getTableName() . " $class", $this->getTableAlias().'.'.$options['foreign']."=$class.".$options['local']);
 			
 			$table->addSelectColumns($this->query, "_{$name}_");
-			$table->prepareSelect($this->query);
+			$entity->prepareSelect($this->query);
 		}
 	}
 	
@@ -495,7 +547,9 @@ abstract class FATable {
 	
 		if (isset($this->many[$name])) {
 			
-			$table = FATable::getInstance($this->many[$name]['record']);
+			$class = $this->many[$name]['record'];
+			$entity = new $class;
+			$table = $entity->getTable();
 		
 			$query = $table->getSelectQuery()
 				->where(
@@ -521,11 +575,14 @@ abstract class FATable {
 			
 			$this->addSelectColumns($this->query);
 			$this->addPrefetchRecords($this->query);
-			
-			$this->prepareSelect($this->query);
 		}
 		
 		return clone $this->query;
+	}
+	
+	public function getDeleteQuery() {
+	
+		return FAPersistence::getDatabase()->delete($this->table);
 	}
 	
 	public function getUpdateQuery() {
@@ -535,9 +592,6 @@ abstract class FATable {
 	
 	public function getInsertQuery() {
 		return FAPersistence::getDatabase()->insert($this->table);
-	}
-	
-	public function prepareSelect(FAQuery $query) {
 	}
 }
 
