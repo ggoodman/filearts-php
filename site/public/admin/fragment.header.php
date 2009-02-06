@@ -31,7 +31,7 @@ jQuery(function(){
 <div class="wrap">
 <div id="user_panel">
 <?php if (!$visitor->isMember()): ?>
-	<?= anchor('.login.login', "Login") ?> or <?= anchor('member.register', "Register") ?>
+	<?= anchor('.login.login', "Login")->backRef() ?> or <?= anchor('.member.register', "Register")->backRef() ?>
 <?php else: ?>
 	Welcome, <?= $visitor->name ?>
 	|

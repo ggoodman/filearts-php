@@ -67,7 +67,8 @@ function create_action($registry, $request, $response) {
 		if ($user) {
 			
 			$request->session['user_id'] = $user->id;
-			path('index.index')->redirectTo();
+			if (isset($request->ref)) FAPath::redirect($request->ref);
+			else path('index.index')->redirectTo();
 		}
 		
 		$response->register_error = "That username is taken, please choose another.";

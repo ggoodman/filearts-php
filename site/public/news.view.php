@@ -27,9 +27,9 @@
 	<?= $comment_form ?>
 <?php else: ?>
 	<p>
-	<?= anchor('login.login')->backRef()->text("Login") ?>
+	<?= anchor('login.login', "Login")->backRef() ?>
 	or
-	<?= anchor('member.register')->backRef()->text("Register") ?>
+	<?= anchor('member.register', "Register")->backRef() ?>
 	to share your comments.
 	</p>
 <?php endif; ?>
