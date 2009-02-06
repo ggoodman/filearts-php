@@ -7,7 +7,10 @@ function module_init($registry, $request, $response) {
 		'articles' => anchor('articles.index', "Articles"),
 	);
 
-	if (!$request->visitor->isMember()) display_http_error("403", "Access Denied");
+	if (!$request->visitor->isMember()) {
+		
+		path('.login.login')->backRef()->redirectTo();
+	}
 }
 
 ?>

@@ -31,11 +31,11 @@ jQuery(function(){
 <div class="wrap">
 <div id="user_panel">
 <?php if (!$visitor->isMember()): ?>
-	<?= anchor('login.login', "Login") ?> or <?= anchor('member.register', "Register") ?>
+	<?= anchor('.login.login', "Login") ?> or <?= anchor('member.register', "Register") ?>
 <?php else: ?>
 	Welcome, <?= $visitor->name ?>
 	|
-	<?= anchor('member.logout', "Logout") ?>
+	<?= anchor('.member.logout', "Logout")->backRef() ?>
 <?php endif; ?>
 </div>
 <h1>File&Aring;rts</h1>

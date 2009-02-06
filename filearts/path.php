@@ -287,6 +287,11 @@ class FAPath {
 		return $this;
 	}
 	
+	public function backRef() {
+		
+		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->__toString());
+	}
+	
 	static public function redirect($path) {
 	
 		header('Location: ' . $path);
@@ -396,11 +401,6 @@ class FAAnchor extends FAPath {
 		$this->title = $title;
 		
 		return $this;
-	}
-	
-	public function backRef() {
-		
-		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->__toString());
 	}
 }
 

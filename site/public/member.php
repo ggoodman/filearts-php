@@ -85,7 +85,8 @@ function logout_action($registry, $request, $response) {
 	if ($request->visitor->isMember()) {
 	
 		unset($request->session['user_id']);
-		path('index.index')->redirectTo();
+		if (isset($request->ref)) FAPath::redirect($request->ref);
+		else path('index.index')->redirectTo();
 	}
 	
 	throw new Exception("You must be logged in to access this page.");
