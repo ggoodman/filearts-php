@@ -11,7 +11,7 @@ class FAPagerPage {
 	
 	public function getLink() {
 	
-		return get_path_args(array('p' => $this->page));
+		return anchor()->set('p', $this->getPage());
 	}
 	
 	public function getPage() {

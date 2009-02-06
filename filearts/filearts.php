@@ -101,8 +101,8 @@ function get_response() {
 
 function load_module() {
 
-	$path = split_path(get_request()->module);
-	$base = dirname($_SERVER['SCRIPT_FILENAME']);
+	$path = split_path(path()->getModule());
+	$base = SITE_DIR;
 	
 	array_unshift($path, '.'); // Allow the algorithm to search the base path
 		
@@ -127,7 +127,7 @@ function load_module() {
 
 function load_site() {
 
-	$base = dirname($_SERVER['SCRIPT_FILENAME']);
+	$base = SITE_DIR;
 	$filename = $base . '/site.init.php';
 	
 	if (file_exists($filename)) require $filename;

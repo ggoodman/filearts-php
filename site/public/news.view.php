@@ -6,11 +6,6 @@
 
 <?php include('fragment.article.php'); ?>
 
-<?php if ($article->user->id == $visitor->id): ?>
-	<?= anchor('news.edit')->arg('id', $article->id)->text("Edit") ?>
-	<?= anchor('news.delete')->arg('id', $article->id)->text("Delete") ?>
-<?php endif; ?>
-
 <?php if ($article->comments->orderBy('Comment.posted DESC')->valid()): ?>
 	<h2 id="comments"><? $article->num_comments ?> Comments</h2>
 	<ul>

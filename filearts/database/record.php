@@ -105,15 +105,13 @@ class FAEntity {
 	public function __get($key) {
 	
 		if (isset($this->record[$key])) return $this->record[$key];
-		if (isset($this->cache[$key])) return $this->cache[$key];
 		
 		if ($ret = $this->table->getJoin($key, $this->record)) {
 			
-			$this->cache[$key] = $ret;
+			$this->$key = $ret;
 			
-			return $this->cache[$key];
+			return $this->$key;
 		}
-		return $this->record[$key];
 	}
 	
 	public function __set($key, $value) {
@@ -128,8 +126,8 @@ class FAEntity {
 
 			$this->record[$key] = $value;
 		} else {
-
-			$this->record->setMeta($key, $value);
+			
+			$this->$key = $value;
 		}
 	}
 	

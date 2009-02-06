@@ -99,9 +99,9 @@ class FAPath {
 			trigger_error("SITE_DIR not defined, assuming document root.", E_USER_NOTICE);
 			define ('SITE_DIR', dirname($_SERVER['DOCUMENT_ROOT']));
 		}
-	
+		
 		$root = preg_split("~/~", realpath($_SERVER['DOCUMENT_ROOT']), -1, PREG_SPLIT_NO_EMPTY);
-		$actual = preg_split("~/~", realpath(dirname($_SERVER['PHP_SELF'])), -1, PREG_SPLIT_NO_EMPTY);
+		$actual = preg_split("~/~", realpath(dirname($_SERVER['SCRIPT_FILENAME'])), -1, PREG_SPLIT_NO_EMPTY);
 		$site = preg_split("~/~", realpath(SITE_DIR), -1, PREG_SPLIT_NO_EMPTY);
 		
 		self::$_base = implode('/', array_diff($site, $root));
@@ -339,6 +339,7 @@ class FAAnchor extends FAPath {
 	protected $text;
 	protected $title;
 	protected $classes = array();
+	protected $attr = array();
 	protected $id = '';
 
 	public function __toString() {
@@ -353,6 +354,8 @@ class FAAnchor extends FAPath {
 		isset($this->id) and $a .= ' id="' . $this->id . '"';
 		empty($this->classes) or $a .= ' class="' . implode(' ', $this->classes) . '"';
 		
+		foreach ($this->attr as $key => $value) $a .= " $key=\"$value\"";
+		
 		$a .= '>';
 		$a .= $this->text;
 		$a .= '</a>';
@@ -363,6 +366,13 @@ class FAAnchor extends FAPath {
 	public function addClass($class) {
 		
 		$this->classes[] = $class;
+		
+		return $this;
+	}
+	
+	public function attr($key, $value) {
+		
+		$this->attr[$key] = $value;
 		
 		return $this;
 	}

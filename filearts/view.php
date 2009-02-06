@@ -57,6 +57,7 @@ function render_view($filename, $context = array()) {
 function display_http_error($http_code, $php_message, $php_code = 0, $trace = array()) {
 
 	$messages = array(
+		403 => "Access denied",
 		404 => "Not found",
 		500 => "Internal server error",
 	);
