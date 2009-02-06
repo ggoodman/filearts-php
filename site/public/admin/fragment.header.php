@@ -14,8 +14,6 @@
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushXml.js"></script>
 <script type="text/javascript">
 jQuery(function(){
-	$("pre code").addClass("brush: php");
-	
 	SyntaxHighlighter.config['tagName'] = "code";
 	SyntaxHighlighter.defaults['html-script'] = true;
 	SyntaxHighlighter.all();

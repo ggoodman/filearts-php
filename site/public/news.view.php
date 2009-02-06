@@ -21,15 +21,15 @@
 	<h2 id="comments">No Comments Yet</h2>
 <?php endif; ?>
 
+<hr />
+<h2 id="respond">Respond</h2>
 <?php if ($visitor->isMember()): ?>
-	<hr />
-	<h2>Respond</h2>
 	<?= $comment_form ?>
 <?php else: ?>
 	<p>
-	<?= anchor('login.login', "Login")->backRef() ?>
+	<?= anchor('login.login', "Login")->backRef('respond') ?>
 	or
-	<?= anchor('member.register', "Register")->backRef() ?>
+	<?= anchor('member.register', "Register")->backRef('respond') ?>
 	to share your comments.
 	</p>
 <?php endif; ?>

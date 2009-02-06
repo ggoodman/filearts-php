@@ -132,6 +132,8 @@ class FAEntity {
 	}
 	
 	public function prepareSelect(FAQuery $query) { return $query; }
+	public function preSave() {}
+	public function postSave() {}
 	
 	public function set($key, $value) {
 	
@@ -251,6 +253,8 @@ class FAEntity {
 	}
 	
 	public function save() {
+	
+		$this->preSave();
 		
 		if ($this->isStored()) {
 		
@@ -284,6 +288,8 @@ class FAEntity {
 			// Replace the current un-tracked record with one pulled from the database
 			$this->find();
 		}
+		
+		$this->postSave();
 		
 		return $this;
 	}

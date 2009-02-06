@@ -25,7 +25,6 @@ jQuery(function(){
 		controls_rte: rte_toolbar,
 		controls_html: html_toolbar
 	});
-	$("pre code").addClass("brush: php");
 	SyntaxHighlighter.config['tagName'] = "code";
 	SyntaxHighlighter.defaults['html-script'] = true;
 	SyntaxHighlighter.all();

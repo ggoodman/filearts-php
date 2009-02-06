@@ -287,9 +287,9 @@ class FAPath {
 		return $this;
 	}
 	
-	public function backRef() {
+	public function backRef($anchor = '') {
 		
-		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->__toString());
+		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->anchor($anchor)->__toString());
 	}
 	
 	static public function redirect($path) {
