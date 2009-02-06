@@ -35,6 +35,13 @@ function article_form($request) {
 					array('type' => 'regex', 'value' => '/[^\s]/')
 				),
 			), array(
+				'type' => 'text',
+				'name' => 'tags',
+				'title' => 'Tags associated with this article',
+				'label' => 'Tags:',
+				'validators' => array(
+				),
+			), array(
 				'type' => 'textarea',
 				'name' => 'body',
 				'title' => 'The body of the article',

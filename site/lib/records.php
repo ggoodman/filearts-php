@@ -84,11 +84,34 @@ class Article extends FAEntity {
 		),
 	);
 	
+	public function postSave() {
+	
+		FAPersistence::getDatabase()->delete('article_tag')
+			->where('article_id=?', $this->id)
+			->execute();
+		
+		$insert = FAPersistence::getDatabase()->insert('article_tag')
+			->column('article_id')
+			->column('tag_id');
+			
+		$tags = array_map('trim', explode(',', $this->tags));
+		$tags = array_unique(array_filter($tags));
+
+		foreach ($tags as $tag) {
+			
+			if ($tag) $insert->values(array($this->id, $tag));
+		}
+		
+		$insert->execute();
+	}
+	
 	public function prepareSelect(FAQuery $query) {
 	
 		return $query
 			->column("COUNT(Comment.id) as num_comments")
-			->leftJoin('comment Comment', 'Comment.article_id=Article.id')
+				->leftJoin('comment Comment', 'Comment.article_id=Article.id')
+			->column("GROUP_CONCAT(DISTINCT tag_id SEPARATOR ', ') as tags")
+				->leftJoin('article_tag at', 'Article.id=at.article_id')
 			->groupBy('Article.id');
 	}
 }

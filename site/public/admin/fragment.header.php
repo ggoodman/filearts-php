@@ -7,8 +7,10 @@
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/style.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shCore.css"/>
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shThemeDefault.css"/>
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/jquery.autocomplete.css"/>
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/jquery.corners.js"></script>
+<script type="text/javascript" src="<?= $base_url ?>js/jquery.autocomplete.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shCore.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushPhp.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushXml.js"></script>
@@ -20,6 +22,9 @@ jQuery(function(){
 	
 	$("button.link").click(function(){
 		document.location = $(this).val();
+	});
+	$("input[name=tags]").autocomplete('tags.php', {
+		multiple: true
 	});
 });
 </script>

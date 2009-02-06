@@ -199,11 +199,13 @@ class FAInsertQuery extends FAQuery {
 
 	protected $table;
 	
+	protected $columns = array();
 	protected $joins = array();
 	protected $where = array();
 	protected $group = array();
 	protected $order = array();
 	protected $set = array();
+	protected $values = array();
 	
 	protected $ignore;
 	protected $select;
@@ -219,6 +221,11 @@ class FAInsertQuery extends FAQuery {
 			$sql .= " {$join['type']} JOIN {$join['table']} $alias ON ({$join['on']})";
 		}
 		
+		if (!empty($this->columns)) {
+			$sql .= " (" . implode(', ', $this->columns) . ")";
+			$sql .= " VALUES " . implode(', ', $this->values);
+		}
+		
 		empty($this->set) or $sql .= " SET " . implode(', ', $this->set);
 		is_null($this->select) or $sql .= " (" . $this->select->getSql() . ")";
 		
@@ -227,6 +234,13 @@ class FAInsertQuery extends FAQuery {
 		empty($this->order) or $sql .= " ORDER BY " . implode(', ', $this->order);
 		
 		return $sql;
+	}
+
+	public function column($column) {
+	
+		$this->columns[] = $column;
+		
+		return $this;
 	}
 	
 	public function groupBy($column) {
@@ -293,6 +307,13 @@ class FAInsertQuery extends FAQuery {
 		is_null($args) or $fragment = $this->dba->mergeArguments($fragment, $args);
 		
 		$this->where[] = $fragment;
+		
+		return $this;
+	}
+	
+	public function values($values) {
+	
+		$this->values[] = $this->dba->mergeArguments("?", array($values));
 		
 		return $this;
 	}

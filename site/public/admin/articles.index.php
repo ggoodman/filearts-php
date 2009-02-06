@@ -12,7 +12,7 @@
 	<tr><td>
 	<?= anchor("articles.edit", "E")->arg('id', $article->id) ?>
 	<?= anchor("articles.delete", "D")->arg('id', $article->id) ?>
-	</td><td><?= $article->title ?></td></tr>
+	</td><td><?= anchor("articles.view", $article->title)->arg('id', $article->id) ?></td></tr>
 	<?php include('fragment.article.php'); ?>
 <?php endforeach; ?>
 </table>
