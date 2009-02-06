@@ -108,10 +108,10 @@ class Article extends FAEntity {
 	public function prepareSelect(FAQuery $query) {
 	
 		return $query
-			->column("COUNT(Comment.id) as num_comments")
-				->leftJoin('comment Comment', 'Comment.article_id=Article.id')
 			->column("GROUP_CONCAT(DISTINCT tag_id SEPARATOR ', ') as tags")
 				->leftJoin('article_tag at', 'Article.id=at.article_id')
+			->column("COUNT(DISTINCT Comment.id) as num_comments")
+				->leftJoin('comment Comment', 'Comment.article_id=Article.id')
 			->groupBy('Article.id');
 	}
 }

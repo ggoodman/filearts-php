@@ -1,5 +1,5 @@
 <h3 class="date"><?= date("F j, Y", strtotime($article->published)) ?></h3>
-<h2><?= anchor('news.view')->arg('id', $article->id)->text($article->title) ?></h2>
+<h2 class="title"><?= anchor('news.view')->arg('id', $article->id)->text($article->title) ?></h2>
 <div class="meta">
 By <?= anchor('members.view')->arg('id', $article->user->id)->text($article->user->name) ?>
 <?php if ($article->tags): ?>

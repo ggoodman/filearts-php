@@ -4,6 +4,7 @@
 <head>
 <title><?= $title ?> - FileArts</title>
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/reset.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.6.0/build/base/base-min.css">
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/style.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/rte/jquery.rte.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shCore.css"/>

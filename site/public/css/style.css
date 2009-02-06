@@ -22,6 +22,7 @@ a:hover {
 	line-height: 60px;
 	position: absolute;
 	left: 0px;
+	margin: 0; padding: 0;
 }
 #user_panel {
 	color: #999999;
@@ -76,6 +77,8 @@ a#download:hover {
 	font-size: 36px;
 	font-style: italic;
 	line-height: 1em;
+	margin: 0;
+	padding: 0;
 	padding-left: 12px;
 	padding-top: 10px;
 	text-shadow:0 1px 0 #E4F2FD;
@@ -103,10 +106,12 @@ h3.date {
 	color: #666666;
 	font-size: 10px;
 	margin: 8px 0 0 0;
+	padding: 0;
 }
-h2 {
+h2.title {
 	font-size: 18px;
 	padding: 10px 0;
+	margin: 0;
 }
 .meta {
 	font-family: Verdana,Arial,Helvetica,sans-serif;
