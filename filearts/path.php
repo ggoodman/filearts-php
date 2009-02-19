@@ -243,7 +243,7 @@ class FAPath {
 	
 	public function backRef() {
 	
-		$this->arg(FAPath::BACKREF_VAR, path());
+		$this->arg(FAPath::BACKREF_VAR, path()->getPath());
 		
 		return $this;
 	}
