@@ -32,7 +32,7 @@ class FATable {
 	
 		// Create the select query
 		$this->selectQuery = FAPersistence::getDatabase($this->entityClass)
-			->select($this->tableName) // Create a select query for this table
+			->select($this->tableName . ' ' . $this->entityClass) // Create a select query for this table
 			->setClass($this->entityClass); // Set the Entity class of the query builder
 		
 		// Add this table's columns to the query
