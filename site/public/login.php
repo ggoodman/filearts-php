@@ -46,7 +46,7 @@ function login_action($registry, $request, $response) {
 			
 				$request->session['user_id'] = $user->id;
 				
-				if (isset($request->ref)) FAPath::redirect($request->ref);
+				if (isset($request->ref)) FAPath::setRedirect($request->ref);
 				else path('..')->redirectTo();
 				
 			} catch (FANotFoundException $e) {
