@@ -2,7 +2,7 @@
 
 define ('DEBUG', TRUE);
 define ('SALT', md5(42));
-define ('SITE_DIR', realpath(dirname(__FILE__) . '/../public'));
+if (!defined('SITE_DIR')) define ('SITE_DIR', realpath(dirname(__FILE__) . '/../public'));
 
 require_once dirname(__FILE__) . '/../../filearts/filearts.php';
 

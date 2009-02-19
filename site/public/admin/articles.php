@@ -4,7 +4,7 @@ require_once '../../lib/bootstrap.php';
 
 function page_init($registry, $request, $response) {
 	
-	$response->topnav['articles']->addClass('current');
+	$response->topnav['articles']->class('current');
 }
 
 function article_form($request) {
@@ -36,7 +36,7 @@ function article_form($request) {
 				),
 			), array(
 				'type' => 'text',
-				'name' => 'tags',
+				'name' => '_tags',
 				'title' => 'Tags associated with this article',
 				'label' => 'Tags:',
 				'validators' => array(

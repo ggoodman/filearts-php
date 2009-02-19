@@ -31,6 +31,8 @@ abstract class FAQuery {
 }
 
 class FASelectQuery extends FAQuery implements IteratorAggregate {
+	
+	private $entityClass;
 
 	private $columns = array();
 	private $joins = array();
@@ -164,6 +166,13 @@ class FASelectQuery extends FAQuery implements IteratorAggregate {
 		return $this->order;
 	}
 	
+	public function setClass($class = NULL) {
+	
+		$this->entityClass = $class;
+		
+		return $this;
+	}
+	
 	public function where($fragment, $args = NULL) {
 	
 		is_null($args) or $fragment = $this->dba->mergeArguments($fragment, $args);
@@ -171,6 +180,26 @@ class FASelectQuery extends FAQuery implements IteratorAggregate {
 		$this->where[] = $fragment;
 		
 		return $this;
+	}
+	
+	public function whereArray($array, $prefix) {
+	
+		foreach ($array as $key => $value) {
+		
+			$this->where($prefix . '.' . $key . '=?', $value);
+		}
+		
+		return $this;
+	}
+	
+	public function execute() {
+	
+		if (class_exists($this->entityClass, FALSE)) {
+		
+			return new FAEntitySet($this->entityClass, $this);
+		}
+		
+		return parent::execute();
 	}
 	
 	public function getSql() {
@@ -397,6 +426,16 @@ class FAUpdateQuery extends FAQuery {
 		is_null($args) or $fragment = $this->dba->mergeArguments($fragment, $args);
 		
 		$this->where[] = $fragment;
+		
+		return $this;
+	}
+	
+	public function whereArray($array) {
+	
+		foreach ($array as $key => $value) {
+		
+			$this->where($key . '=?', $value);
+		}
 		
 		return $this;
 	}

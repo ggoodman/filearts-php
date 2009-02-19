@@ -85,4 +85,18 @@ function display_http_error($http_code, $php_message, $php_code = 0, $trace = ar
 	exit();
 }
 
+function render($filename, $context = array()) {
+
+	if (!file_exists($filename)) {
+	
+		$filename = '../' . $filename;
+	}
+	
+	if (file_exists($filename)) {
+	
+		extract($context);
+		require($filename);
+	}
+}
+
 ?>

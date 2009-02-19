@@ -1,461 +1,405 @@
 <?php
 
+interface FAPathBuilder {
+
+	public function buildPath(FAPath $path);
+}
+
+interface FAPathRenderer {
+
+	public function renderPath(FAPath $path);
+}
+
 /**
- * A class representing a path
+ * PathBuilder that creates paths to actual files, passing the action through a GET parameter
  */
+class FADefaultPathBuilder implements FAPathBuilder {
+
+	public function buildPath(FAPath $path) {
+	
+		$ret = $path->getBase();
+		$args = $path->getArgs();
+		
+		if ($path->getModule() != FAPath::DEFAULT_MODULE) $ret .= str_replace('.', '/', $path->getModule()) . '/';
+		if ($path->getAction() != FAPath::DEFAULT_ACTION) $args[FAPath::ACTION_VAR] = $path->getAction();
+		
+		$ret .= $path->getController() . '.php';
+		
+		if (!empty($args)) $ret .= '?' . http_build_query($args, '');
+		if ($path->getAnchor()) $ret .= '#' . $path->getAnchor();
+		
+		return $ret;
+	}
+}
+
+class FAFilenamePathBuilder implements FAPathBuilder {
+
+	public function buildPath(FAPath $path) {
+	
+		$ret = $path->getRoot() . $path->getBase();
+		
+		if ($path->getModule() != FAPath::DEFAULT_MODULE) $ret .= str_replace('.', '/', $path->getModule()) . '/';
+	
+		$ret .= $path->getController() . '.php';
+		
+		return $ret;
+	}
+}
+
+class FADefaultPathRenderer implements FAPathRenderer {
+
+	public function renderPath(FAPath $path) {
+	
+		return $path->getPath();
+	}
+}
+
 class FAPath {
 
-	private $base;
-	private $module;
-	private $controller;
-	private $action;
+	const ACTION_VAR = 'a';
+	const BACKREF_VAR = 'ref';
+
+	const DEFAULT_MODULE = 'index';
+	const DEFAULT_CONTROLLER = 'index';
+	const DEFAULT_ACTION = 'index';
 	
-	private $anchor;
+	protected $base;
+	protected $root;
+		
+	protected $module;
+	protected $controller;
+	protected $action;
 	
-	private $args = array();
-	private $mask = array();
+	protected $args = array();
+	protected $mask = array();
+	protected $meta = array();
 	
-	static private $abs = FALSE;
-	static private $based = FALSE;
+	protected $anchor;
 	
+	protected $pathBuilder;
+	protected $pathRenderer;
+	
+	static private $_root;
 	static private $_base;
 	static private $_module;
 	static private $_controller;
 	static private $_action;
 	static private $_args;
 	
-	/**
-	 * Create the base path object and initialize it
-	 *
-	 * @access	private
-	 */
-	public function __construct() {
+	static private $defaultBuilder;
+	static private $defaultRenderer;
 	
-		if (!isset(self::$_action)) self::init();
+	public static function setDefaultPathBuilder(FAPathBuilder $builder) {
 	
-		$this->base = self::$_base;
-		$this->module = self::$_module;
-		$this->controller = self::$_controller;
-		$this->action = self::$_action;
-		$this->args = self::$_args;
+		self::$defaultBuilder = $builder;
 	}
 	
-	/**
-	 * Create the path string
-	 *
-	 * @return	string	Returns the path as a string
-	 */
-	public function __toString() {
-		$args = array();
-		
-		foreach ($this->mask as $allowed) {
+	public static function setDefaultPathRenderer(FAPathRenderer $renderer) {
+	
+		self::$defaultRenderer = $renderer;
+	}
+	
+	public static function setRedirect($path) {
+	
+		header("Location: $path");
+		exit();
+	}
 
-			isset($this->args[$allowed]) and $args[$allowed] = $this->args[$allowed];
-		}
-		
-		if (isset($args['a'])) unset($args['a']);
-		
-		$path = '';
-		
-		if ($this->module) $path .= $this->module . '/';
-		
-		if ($this->controller != 'index' || $this->action != 'index') $path .= $this->controller . '.php';
-		if ($this->action != 'index') $args['a'] = $this->action;
-		if (!empty($args)) $path .= '?' . http_build_query($args, '');
-		if ($this->anchor) $path .= '#' . $this->anchor;
-		
-		if (self::$abs) $path = 'http://' . $_SERVER['SERVER_NAME'] . $this->base . $path;
-		elseif (!self::$based) $path = $this->base . $path;
-	
-		return $path;
-	}
-	
-	/**
-	 * Tell FAPath whether to use absolute paths or not
-	 *
-	 * @static
-	 * @param	bool	Use absolute paths
-	 */
-	static public function absolute($abs = FALSE) {
-	
-		self::$abs = $abs;
-	}
-	
-	static public function based($based = FALSE) {
-	
-		self::$based = $based;
-	}
-	
 	/**
 	 * Initialize the path object and determine actual path
 	 *
-	 * @access	private
 	 * @static
 	 */
-	private static function init() {
+	public static function init() {
 	
 		if (!defined('SITE_DIR')) {
 		
-			trigger_error("SITE_DIR not defined, assuming document root.", E_USER_NOTICE);
-			define ('SITE_DIR', dirname($_SERVER['DOCUMENT_ROOT']));
+			//trigger_error("SITE_DIR not defined, assuming document root.", E_USER_NOTICE);
+			define ('SITE_DIR', dirname($_SERVER['SCRIPT_FILENAME']));
 		}
 		
 		$root = preg_split("~/~", realpath($_SERVER['DOCUMENT_ROOT']), -1, PREG_SPLIT_NO_EMPTY);
 		$actual = preg_split("~/~", realpath(dirname($_SERVER['SCRIPT_FILENAME'])), -1, PREG_SPLIT_NO_EMPTY);
 		$site = preg_split("~/~", realpath(SITE_DIR), -1, PREG_SPLIT_NO_EMPTY);
 		
+		self::$_root = '/' . implode('/', $root);
 		self::$_base = implode('/', array_diff($site, $root));
-		self::$_module = implode('/', array_diff($actual, $site));
-		self::$_controller = basename($_SERVER['PHP_SELF'], '.php');
-		self::$_action = (isset($_GET['a']) ? $_GET['a'] : 'index');
+		self::$_module = implode('.', array_diff($actual, $site));
+		self::$_controller = basename($_SERVER['SCRIPT_FILENAME'], '.php');
+		self::$_action = (isset($_GET[self::ACTION_VAR]) ? $_GET[self::ACTION_VAR] : self::DEFAULT_ACTION);
+		
+		if (!self::$_module) self::$_module = self::DEFAULT_MODULE;
+		if (!self::$_controller) self::$_controller = self::DEFAULT_CONTROLLER;
 		
 		self::$_base = (self::$_base) ? '/' . self::$_base . '/' : '/';
 		
 		self::$_args = $_GET;
+		
+		self::setDefaultPathBuilder(new FADefaultPathBuilder);
+		self::setDefaultPathRenderer(new FADefaultPathRenderer);
+	}
+
+	public function __construct($route = '') {
+	
+		if (!isset(self::$_action)) self::init();
+	
+		$this->root = self::$_root;
+		$this->base = self::$_base;
+		$this->module = self::$_module;
+		$this->controller = self::$_controller;
+		$this->action = self::$_action;
+		$this->args = self::$_args;
+		
+		$this->setBuilder(self::$defaultBuilder);
+		$this->setRenderer(self::$defaultRenderer);
+		
+		if ($route) {
+		
+			$split = explode(':', $route);
+			$route = array_shift($split);
+			$parts = explode('.', $route);
+			
+			empty($parts) or $this->a(array_pop($parts));
+			empty($parts) or $this->c(array_pop($parts));
+			empty($parts) or $this->m(implode('.', $parts));
+			
+			empty($split) or $this->keep(explode(',', array_shift($split)));
+		}
 	}
 	
-	/**
-	 * Get the current action
-	 *
-	 * @return	string	The current action
-	 */
+	public function __call($meta, $args) {
+	
+		$this->meta[$meta] = array_shift($args);
+		
+		return $this;
+	}
+	
+	public function __toString() {
+	
+		return $this->pathRenderer->renderPath($this);
+	}
+	
+	public function setDefault() {
+	
+		self::$_root = $this->root;
+		self::$_base = $this->base;
+		self::$_module = $this->module;
+		self::$_controller = $this->controller;
+		self::$_action = $this->action;
+		self::$_args = $this->args;
+		
+		return $this;
+	}
+	
+	public function a($action = '') {
+	
+		return $this->action($action);
+	}
+	public function action($action = '') {
+	
+		$this->action = ($action) ? $action : self::DEFAULT_ACTION;
+		
+		return $this;
+	}
+	
 	public function getAction() {
 	
 		return $this->action;
 	}
 	
-	/**
-	 * Get the current arguments
-	 *
-	 * @return	array	The current arguments
-	 */
-	public function getArgs() {
+	public function c($controller = '') {
+	
+		return $this->controller($controller);
+	}
+	public function controller($controller = '') {
+	
+		$this->controller = ($controller) ? $controller : self::DEFAULT_CONTROLLER;
 		
-		return $this->args;
+		return $this;
 	}
 	
-	/**
-	 * Get the current base url
-	 *
-	 * @return	string	The current base url
-	 */
-	public function getBase() {
-	
-		return $this->base;
-	}
-	
-	/**
-	 * Get the current controller
-	 *
-	 * @return	string	The current controller
-	 */
 	public function getController() {
 	
 		return $this->controller;
 	}
 	
-	/**
-	 * Get the current module
-	 *
-	 * @return	string	The current module
-	 */
-	public function getModule() {
-	
-		return $this->module;
-	}
-	
-	public function arg($key, $value) {
-	
-		return $this->args(array($key => $value));
-	}
-	
-	/**
-	 * Chainable function to set arguments
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function args($args) {
-	
-		$this->keep(array_keys($args));
-		$this->args = array_merge($this->args, $args);
-		
-		return $this;
-	}
-	
-	/**
-	 * Chainable function to remove mask arguments
-	 *
-	 * Only arguments that are present in the mask will be kept in the final url.
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function discard($mask) {
-	
-		$mask = (is_array($mask)) ? $mask : func_get_args();
-		
-		$this->mask = array_diff($this->mask, $mask);
-		
-		return $this;
-	}
-	
-	/**
-	 * Chainable function to add mask arguments
-	 *
-	 * Only arguments that are present in the mask will be kept in the final url.
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function keep($mask) {
-	
-		$mask = (is_array($mask)) ? $mask : func_get_args();
-		
-		$this->mask = array_merge($this->mask, $mask);
-		
-		return $this;
-	}
-	
-	/**
-	 * Alias of FAPath::module()
-	 *
-	 * @see	module()
-	 */
-	public function m($module) {
+	public function m($module = '') {
 	
 		return $this->module($module);
 	}
+	public function module($module = '') {
 	
-	/**
-	 * Chainable function to set the module
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function module($module) {
-	
-		$this->module = $module;
+		$this->module = ($module) ? $module : self::DEFAULT_MODULE;
 		
 		return $this;
 	}
 	
-	/**
-	 * Alias of FAPath::controller()
-	 *
-	 * @see	controller()
-	 */
-	public function c($controller) {
-	
-		return $this->controller($controller);
-	}
-	
-	/**
-	 * Chainable function to set the controller
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function controller($controller) {
-	
-		$this->controller = ($controller) ? $controller : 'index';
-		
-		return $this;
-	}
-	
-	/**
-	 * Alias of FAPath::action()
-	 *
-	 * @see	action()
-	 */
-	public function a($action) {
-	
-		return $this->action($action);
-	}
-	
-	/**
-	 * Chainable function to set the action
-	 *
-	 * @return	FAPath	The path object itself
-	 */
-	public function action($action) {
-	
-		$this->action = ($action) ? $action : 'index';
-		
-		return $this;
-	}
-	
-	public function anchor($anchor) {
+	public function anchor($anchor = '') {
 	
 		$this->anchor = $anchor;
 		
 		return $this;
 	}
 	
-	public function backRef($anchor = '') {
+	public function backRef() {
+	
+		$this->arg(FAPath::BACKREF_VAR, path());
 		
-		return $this->arg('ref', path()->keep(array_keys($this->getArgs()))->anchor($anchor)->__toString());
+		return $this;
 	}
 	
-	static public function redirect($path) {
+	public function keep($key) {
+		
+		if (!is_array($key)) $key = func_get_args();
+		
+		foreach ($key as $keep) $this->mask[$keep] = $keep;
+		
+		return $this;
+	}
 	
-		header('Location: ' . $path);
-		exit();
+	public function arg($key, $value = '') {
+	
+		$this->args[$key] = $value;
+		$this->mask[$key] = $key;
+		
+		return $this;
+	}
+	
+	public function args($args = array()) {
+	
+		foreach ($args as $key => $value) $this->arg($key, $value);
+		
+		return $this;
+	}
+	
+	public function getBase() {
+	
+		return $this->base;
+	}
+	
+	public function getArgs() {
+	
+		$args = array();
+	
+		foreach ($this->mask as $allowed) {
+		
+			if (isset($this->args[$allowed])) $args[$allowed] = $this->args[$allowed];
+		}
+		
+		return $args;
+	}
+	
+	public function getMeta($key = NULL) {
+	
+		if ($key !== NULL) {
+		
+			if (isset($this->meta[$key])) return $this->meta[$key];
+		} else {
+	
+			return $this->meta;
+		}
+	}
+	
+	public function getModule() {
+	
+		return $this->module;
+	}
+	
+	public function getAnchor() {
+	
+		return $this->anchor;
+	}
+	
+	public function setMetaArray($meta) {
+	
+		$this->meta = array_merge($this->meta, $meta);
+		
+		return $this;
+	}
+
+	public function getPath() {
+	
+		return $this->pathBuilder->buildPath($this);
+	}
+	
+	public function getRoot() {
+		
+		return $this->root;
+	}
+	
+	public function getRoute() {
+	
+		return "{$this->module}.{$this->controller}.{$this->action}";
 	}
 	
 	public function redirectTo() {
 	
-		self::redirect($this);
+		self::setRedirect($this);
 	}
-	
-	public function getAncestors() {
-	
-		$ancestors = array();
-		$path = path('..');
-		
-		$ancestors[] = clone $path;
-		$sep = '';
-		
-		if ($this->getModule()) {
-		
-			foreach (explode('/', $this->getModule()) as $module) {
-			
-				$path->m($path->getModule() . $sep . $module);
-				
-				$ancestors[] = clone $path;
-				$sep = '/';
-			}
-		}
 
-		if ($this->getController() != 'index') $ancestors[] = clone $path->c($this->getController());
-		//if ($this->getAction() != 'index') $ancestors[] = clone $path->a($this->getAction());
-				
-		return $ancestors;
-	}
+	public function setBuilder(FAPathBuilder $builder) {
 	
-	public function getTitle() {
-	
-		if ($this->getAction() != 'index') $title = $this->getAction();
-		else if ($this->getController() != 'index') $title = $this->getController();
-		else if ($this->getModule() == '') $title = 'home';
-		else $title = array_pop(explode('/', $this->getModule()));
-		
-		return str_replace('_', ' ', $title);
-	}
-}
-
-class FAAnchor extends FAPath {
-
-	protected $text;
-	protected $title;
-	protected $classes = array();
-	protected $attr = array();
-	protected $id = '';
-
-	public function __toString() {
-	
-		$url = parent::__toString();
-	
-		isset($this->text) or $this->text = $url;
-	
-		$a = '<a href="' . $url .'"';
-		
-		isset($this->title) and $a .= ' title="' . $this->title . '"';
-		isset($this->id) and $a .= ' id="' . $this->id . '"';
-		empty($this->classes) or $a .= ' class="' . implode(' ', $this->classes) . '"';
-		
-		foreach ($this->attr as $key => $value) $a .= " $key=\"$value\"";
-		
-		$a .= '>';
-		$a .= $this->text;
-		$a .= '</a>';
-		
-		return $a;
-	}
-	
-	public function addClass($class) {
-		
-		$this->classes[] = $class;
+		$this->pathBuilder = $builder;
 		
 		return $this;
 	}
 	
-	public function attr($key, $value) {
-		
-		$this->attr[$key] = $value;
-		
-		return $this;
-	}
+	public function setRenderer(FAPathRenderer $renderer) {
 	
-	public function id($id) {
-	
-		$this->id = $id;
-		
-		return $this;
-	}
-	
-	public function text($text) {
-	
-		$this->text = $text;
-		
-		return $this;
-	}
-	
-	public function title($title) {
-	
-		$this->title = $title;
+		$this->pathRenderer = $renderer;
 		
 		return $this;
 	}
 }
 
-/**
- * Create and return a path object
- *
- * Pass in a path in the form of [module.][controller.]action
- * If you do not specify a module, controller or action, the current module, controller and/or
- * action is assumed.
- *
- * To obtain the path itself, you need to print the path object or explicitly call its __toString
- * method.
- *
- * <code>
- * print path('sub.module.controller.action');		// sub/module/controller.php?a=action
- * print path('module.controller.action');			// module/controller.php?a=action
- * print path('controller.action');					// controller.php?a=action
- * print path('action');							// current.php?a=action
- * print path();									// current.php
- * print path()
- *	->args(array('id' => 42));						// current.php?id=42
- * print path()
- *	->args(array('id' => 42, 's' => 'search for'));	// current.php?id=42&s=search+for
- * print path()
- *	->args(array('a' => 'A', 's' => 'search for'))
- *	->discard('b');									// current.php?id=42
- * </code>
- *
- * @return	FAPath	The chainable path object
- */
-function path($parts = '', $path = NULL) {
+class FAAnchorPathRenderer implements FAPathRenderer {
 
-	$path or $path = new FAPath;
+	public function renderPath(FAPath $path) {
 	
-	if (!$parts) return $path;
+		extract(array_merge(array(
+			'title' => '',
+			'text' => '',
+			'class' => '',
+			'id' => '',
+			'href' => $path->getPath(),
+		), array_filter($path->getMeta())));
+		
+		if (!$text) $text = $title;
+		if (!$text) $text = $path->getRoute();
+		
+		return "<a class=\"$class\" href=\"$href\" id=\"$id\" title=\"$title\">$text</a>";
+	}
+}
+
+interface FALinkable {
+
+	public function getPath();
+}
+
+function path($route = '') {
+
+	if ($route instanceof FALinkable) {
 	
-	$split = explode(':', $parts);
-	$parts = explode('.', array_shift($split));
+		return $route->getPath();
+	}
 	
-	empty($parts) or $path->a(array_pop($parts));
-	empty($parts) or $path->c(array_pop($parts));
-	empty($parts) or $path->m(implode('/', $parts));
+	if ($route instanceof FAPath) {
 	
-	empty($split) or $path->keep(explode(',', array_shift($split)));
+		return $route;
+	}
+	
+	return new FAPath($route);
+}
+
+function a($route, $text = NULL) {
+
+	$path = path($route)->setRenderer(new FAAnchorPathRenderer);
+	
+	if ($text !== NULL) $path->text($text)->title($text);
 	
 	return $path;
 }
 
-function anchor($parts = '', $text = NULL) {
-
-	$path = path($parts, new FAAnchor);
-	
-	is_null($text) or $path->text($text);
-	
-	return $path;
-}
+function anchor($route, $text = NULL) { return a($route, $text); }
 
 ?>

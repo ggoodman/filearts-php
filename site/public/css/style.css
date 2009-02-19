@@ -1,3 +1,4 @@
+html, body { margin: 0; padding: 0; }
 body {
 	color:#555555;
 	font-family:"Lucida Grande",Verdana,"Bitstream Vera Sans",Arial,sans-serif;
@@ -70,6 +71,7 @@ a#download:hover {
 	min-height: 20px;
 	padding: 10px;
 	overflow: auto;
+	margin-bottom: 1em;
 }
 #subhead h2 {
 	color: #555555;
@@ -93,7 +95,9 @@ a#download:hover {
 	line-height: 1.5em;
 }
 #footer {
+	clear: both;
 	border-top: 1px solid #CCCCCC;
+	margin-top: 1em;
 }
 .wrap {
 	width: 800px;
@@ -134,4 +138,41 @@ h2.title {
 textarea {
 	width: 99%;
 	height: 200px;
+}
+ul.ops, .pager {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.pager {
+	float: right;
+	margin: 4px 0;
+}
+ul.ops li, .pager li {
+	float: left;
+	margin: 4px;
+	font-size: 10px;
+}
+.pager li a {
+	display: block;
+	line-height: 16px;
+	text-align: center;
+	width: 16px;
+	height: 16px;
+}
+ul.ops li:hover {
+	
+}
+.icon-button {
+	font-size: 10px;
+	display: inline-block;
+	position: relative;
+	padding: 0.4em 1em 0.4em 20px;
+	margin: 4px;
+}
+.icon-button span {
+	left: 0.2em;
+	margin: -10px 5px 0 0;
+	position:absolute;
+	top: 50%;
 }

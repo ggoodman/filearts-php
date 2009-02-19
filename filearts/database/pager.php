@@ -1,34 +1,11 @@
 <?php
 
-class FAPagerPage {
-
-	protected $page;
-	
-	public function __construct($page) {
-	
-		$this->page = $page;
-	}
-	
-	public function getLink() {
-	
-		return anchor()->set('p', $this->getPage());
-	}
-	
-	public function getPage() {
-		
-		return $this->page;
-	}
-}
-
-class FAPageIterator extends ArrayIterator {
-
-	public function current() {
-		
-		return new FAPagerPage(parent::current());
-	}
-}
-
 class FAPager {
+
+	const DEFAULT_PAGE_SIZE = 20;
+
+	const PAGE_VAR = 'p';
+	const PAGE_SIZE_VAR = 's';
 
 	protected $total;
 	protected $page;
@@ -46,34 +23,48 @@ class FAPager {
 		return $this->page;
 	}
 	
+	public function getPath() {
+	
+		$path = path();
+		
+		if ($path->getArg(self::PAGE_SIZE_VAR) !== self::DEFAULT_PAGE_SIZE)
+			$path->keep(self::PAGE_SIZE_VAR);
+		
+		return $path;
+	}
+	
 	public function getNumPages() {
 
 		return ceil($this->total / $this->size);
 	}
 	
 	public function getPages() {
+	
+		$pages = array();
 		
-		return new FAPageIterator(range(1, $this->getNumPages()));
-	}
-	
-	public function firstPage() {
+		foreach (range(1, $this->getNumPages()) as $i) $pages[$i] = $this->getPath()->arg(self::PAGE_VAR, $i);
 		
-		return get_path_args(array('p' => 1));
+		return $pages;
 	}
 	
-	public function prevPage() {
-		
-		return get_path_args(array('p' => $this->page - 1));
+	public function getFirstPage() {
+	
+		return $this->getPath()->arg(self::PAGE_VAR, 1);
 	}
 	
-	public function nextPage() {
-
-		return get_path_args(array('p' => $this->page + 1));
+	public function getPrevPage() {
+	
+		return $this->getPath()->arg(self::PAGE_VAR, $this->page - 1);
 	}
 	
-	public function lastPage() {
-
-		return get_path_args(array('p' => $this->getNumPages()));
+	public function getNextPage() {
+	
+		return $this->getPath()->arg(self::PAGE_VAR, $this->page + 1);
+	}
+	
+	public function getLastPage() {
+	
+		return $this->getPath()->arg(self::PAGE_VAR, $this->getNumPages());
 	}
 
 	public function isFirstPage() {
@@ -86,21 +77,25 @@ class FAPager {
 		return ($this->page >= $this->total / $this->size);
 	}
 	
-	static public function paginate(FARecordSet $results, $size = 10) {
+	static public function paginate(FAEntitySet $results, $size = self::DEFAULT_PAGE_SIZE) {
 	
-		$request = get_request();
+		$request = FARequest::instance();
 		
-		if (!isset($request->p)) $request->p = 1;
-		if (!isset($request->s)) $request->s = $size;
+		$p = self::PAGE_VAR;
+		$s = self::PAGE_SIZE_VAR;
+		
+		if (!isset($request->$p)) $request->$p = 1;
+		if (!isset($request->$s)) $request->$s = $size;
 
-		$limit = $request->s;
-		$offset = $request->s * ($request->p - 1);
+		$limit = $request->$s;
+		$offset = $request->$s * ($request->$p - 1);
 
 		$results->getQuery()->limit($limit)->offset($offset);
 
 		$query = clone $results->getQuery();
 		
 		$result = $query
+			->setClass()
 			->clearColumns()
 			->clearOrder()
 			->clearGroups()
@@ -114,13 +109,13 @@ class FAPager {
 		unset($query);
 		unset($result);
 		
-		get_response()->pager = new FAPager($total, $request->p, $request->s);
+		$results->pager = new FAPager($total, $request->$p, $request->$s);
 		
 		return $results;
 	}
 }
 
-function paginate(FARecordSet $results, $size = 10) {
+function paginate(FAEntitySet $results, $size = FAPager::DEFAULT_PAGE_SIZE) {
 	
 	return FAPager::paginate($results, $size);
 }

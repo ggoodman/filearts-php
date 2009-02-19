@@ -1,29 +1,38 @@
 <?php
 
-class User extends FAEntity {
+class User extends FAEntity implements FALinkable {
 
-	protected $tableDef = array(
-		'table' => 'user',
-		'columns' => array(
-			'id' => array(
-				'type' => 'int',
-				'primary' => TRUE,
-				'autoIncrement' => TRUE,
-			),
-			'username' => array(
-				'type' => 'varchar',
-				'size' => 40,
-			),
-			'password' => array(
-				'type' => 'char',
-				'size' => 32,
-			),
-			'name' => array(
-				'type' => 'varchar',
-				'size' => 60,
-			),
-		),
-	);
+	public static function setTableDefinition(FATable $table) {
+		
+		$table->setTableName('user');
+		
+		$table->hasColumn('id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+			'autoIncrement' => TRUE,
+		));
+		$table->hasColumn('username', array(
+			'type' => 'varchar',
+			'size' => 40,
+		));
+		$table->hasColumn('password', array(
+			'type' => 'char',
+			'size' => 32,
+		));
+		$table->hasColumn('name', array(
+			'type' => 'varchar',
+			'size' => 60,
+		));
+	}
+	
+	public function getPath() {
+	
+		$path = new FAPath('users.view');
+		
+		return $path
+			->id($this->id)
+			->arg('id', $this->id);
+	}
 
 	public function verify($credentials = array()) {
 	
@@ -32,69 +41,75 @@ class User extends FAEntity {
 			'password' => NULL,
 		), $credentials);
 		
-		$matched = FAPersistence::getInstance()->findAll('User')
-			->where('User.username=? AND User.password=?', array(
-				$credentials['username'],
-				md5(SALT . $credentials['password']),
-			)
-		);
+		$this->username = $credentials['username'];
+		$this->password = md5(SALT . $credentials['password']);
 		
-		if ($matched->valid()) return $matched->current();
+		return $this->find();
 	}
 }
 
-class Article extends FAEntity {
+class Article extends FAEntity implements FALinkable {
 
-	protected $tableDef = array(
-		'table' => 'article',
-		'columns' => array(
-			'id' => array(
-				'type' => 'int',
-				'primary' => TRUE,
-				'autoIncrement' => TRUE,
-			),
-			'user_id' => array(
-				'type' => 'int',
-			),
-			'published' => array(
-				'type' => 'date',
-			),
-			'title' => array(
-				'type' => 'varchar',
-				'size' => 120,
-			),
-			'body' => array(
-				'type' => 'text',
-			),
-		),
-		'hasOne' => array(
-			'user' => array(
-				'local' => 'id',
-				'foreign' => 'user_id',
-				'record' => 'User',
-				'prefetch' => TRUE,
-			),
-		),
-		'hasMany' => array(
-			'comments' => array(
-				'record' => 'Comment',
-				'local' => 'id',
-				'foreign' => 'article_id',
-			),
-		),
-	);
+	public static function setTableDefinition(FATable $table) {
+		
+		$table->setTableName('article');
+		
+		$table->hasColumn('id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+			'autoIncrement' => TRUE,
+		));
+		$table->hasColumn('user_id', array(
+			'type' => 'int',
+		));
+		$table->hasColumn('published', array(
+			'type' => 'date',
+		));
+		$table->hasColumn('title', array(
+			'type' => 'varchar',
+			'size' => 120,
+		));
+		$table->hasColumn('body', array(
+			'type' => 'text',
+		));
+
+		$table->hasOne('user', array(
+			'local' => 'id',
+			'foreign' => 'user_id',
+			'class' => 'User',
+			'prefetch' => TRUE,
+		));
+			
+		$table->hasMany('comments', array(
+			'class' => 'Comment',
+			'local' => 'id',
+			'foreign' => 'article_id',
+		));
+	}
+	
+	public function getTags() {
+	
+		$tags = array();
+		
+		foreach (array_map('trim', explode(',', $this->_tags)) as $tag) {
+		
+			$tags[] = new Tag(array('article_id' => $this->id, 'tag' => $tag));
+		}
+		
+		return $tags;
+	}
 	
 	public function postSave() {
 	
-		FAPersistence::getDatabase()->delete('article_tag')
+		FAPersistence::getDatabase($this)->delete('article_tag')
 			->where('article_id=?', $this->id)
 			->execute();
 		
-		$insert = FAPersistence::getDatabase()->insert('article_tag')
+		$insert = FAPersistence::getDatabase($this)->insert('article_tag')
 			->column('article_id')
 			->column('tag_id');
 			
-		$tags = array_map('trim', explode(',', $this->tags));
+		$tags = array_map('trim', explode(',', $this->_tags));
 		$tags = array_unique(array_filter($tags));
 
 		foreach ($tags as $tag) {
@@ -105,10 +120,21 @@ class Article extends FAEntity {
 		$insert->execute();
 	}
 	
-	public function prepareSelect(FAQuery $query) {
+	public function getPath() {
+	
+		$path = new FAPath('blog.view');
+		
+		return $path
+			->arg('id', $this->id)
+			->title(str_replace(' ', '-', $this->title))
+			->year(date('Y', strtotime($this->published)))
+			->month(date('m', strtotime($this->published)));
+	}
+	
+	public static function prepareSelect(FAQuery $query) {
 	
 		return $query
-			->column("GROUP_CONCAT(DISTINCT tag_id SEPARATOR ', ') as tags")
+			->column("GROUP_CONCAT(DISTINCT tag_id SEPARATOR ', ') as _tags")
 				->leftJoin('article_tag at', 'Article.id=at.article_id')
 			->column("COUNT(DISTINCT Comment.id) as num_comments")
 				->leftJoin('comment Comment', 'Comment.article_id=Article.id')
@@ -118,43 +144,77 @@ class Article extends FAEntity {
 
 class Comment extends FAEntity {
 
-	protected $tableDef = array(
-		'table' => 'comment',
-		'columns' => array(
-			'id' => array(
-				'type' => 'int',
-				'primary' => TRUE,
-				'autoIncrement' => TRUE,
-			),
-			'user_id' => array(
-				'type' => 'int',
-			),
-			'article_id' => array(
-				'type' => 'int',
-			),
-			'parent_id' => array(
-				'type' => 'int',
-			),
-			'posted' => array(
-				'type' => 'date',
-			),
-			'body' => array(
-				'type' => 'text',
-			),
-		),
-		'hasOne' => array(
-			'user' => array(
-				'local' => 'id',
-				'foreign' => 'user_id',
-				'record' => 'User',
-				'prefetch' => TRUE,
-			),
-			'article' => array(
-				'local' => 'id',
-				'foreign' => 'article_id',
-			),
-		),
-	);
+	public static function setTableDefinition(FATable $table) {
+		
+		$table->setTableName('comment');
+
+		$table->hasColumn('id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+			'autoIncrement' => TRUE,
+		));
+		$table->hasColumn('user_id', array(
+			'type' => 'int',
+		));
+		$table->hasColumn('article_id', array(
+			'type' => 'int',
+		));
+		$table->hasColumn('parent_id', array(
+			'type' => 'int',
+		));
+		$table->hasColumn('posted', array(
+			'type' => 'date',
+		));
+		$table->hasColumn('body', array(
+			'type' => 'text',
+		));
+
+		$table->hasOne('user', array(
+			'local' => 'id',
+			'foreign' => 'user_id',
+			'class' => 'User',
+			'prefetch' => TRUE,
+		));
+	
+		$table->hasOne('article', array(
+			'local' => 'id',
+			'foreign' => 'article_id',
+		));
+
+	}
+}
+
+class Tag extends FAEntity implements FALinkable {
+
+	public static function setTableDefinition(FATable $table) {
+		
+		$table->setTableName('article_tag');
+
+		$table->hasColumn('article_id', array(
+			'type' => 'int',
+			'primary' => TRUE,
+		));
+		$table->hasColumn('tag', array(
+			'column' => 'tag_id',
+			'type' => 'varchar',
+			'primary' => TRUE,
+		));
+
+		$table->hasOne('article', array(
+			'local' => 'id',
+			'foreign' => 'article_id',
+			'class' => 'Article',
+		));
+	}
+	
+	public function getPath() {
+	
+		$path = new FAPath('tags.view');
+		
+		return $path
+			->arg('tag', $this->tag)
+			->tag($this->tag);
+	}
 }
 
 ?>

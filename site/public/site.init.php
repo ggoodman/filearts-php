@@ -2,7 +2,7 @@
 
 function site_init($registry, $request, $response) {
 
-	$registry->dba = FAPersistence::connect(database('mysql://root@localhost/filearts'));
+	$registry->dba = FAPersistence::init('mysql://root@localhost/filearts');
 	
 	$request->visitor = new Visitor;
 	

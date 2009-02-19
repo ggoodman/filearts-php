@@ -39,18 +39,20 @@ function login_action($registry, $request, $response) {
 	if ($request->method == 'POST') {
 	
 		if ($response->login_form->isValid($request->post)) {
+		
+			try {
+		
+				$user = $registry->dba->User->verify($response->login_form->getValues());
 			
-			$user = $registry->dba->User->verify($response->login_form->getValues());
-			
-			if ($user) {
-				
 				$request->session['user_id'] = $user->id;
 				
 				if (isset($request->ref)) FAPath::redirect($request->ref);
-				else path('index.index')->redirectTo();
-			}
+				else path('..')->redirectTo();
+				
+			} catch (FANotFoundException $e) {
 			
-			$response->login_error = "Invalid username/password";
+				$response->login_error = "Invalid username/password";
+			}
 		} else {
 		
 			$response->login_error = "Please enter a valid username and password";

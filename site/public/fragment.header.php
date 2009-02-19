@@ -14,7 +14,6 @@
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shCore.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushPhp.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/sh/scripts/shBrushXml.js"></script>
-<script type="text/javascript" src="<?= $base_url ?>js/jquery.code.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.rte.tb.js"></script>
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.ocupload-1.1.4.js"></script>

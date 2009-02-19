@@ -3,11 +3,12 @@
 define('STARTUP', array_sum(explode(' ', microtime())));
 
 error_reporting(E_ALL);
-set_error_handler('handle_error');
-set_exception_handler('handle_exception');
-ob_start();
+//set_error_handler('handle_error');
+//set_exception_handler('handle_exception');
+//ob_start();
 
 require_once 'functions.php';
+require_once 'router.php';
 require_once 'path.php';
 require_once 'view.php';
 require_once 'database.php';
@@ -52,6 +53,8 @@ class FARequest extends stdClass {
 		$this->get = (get_magic_quotes_gpc()) ? stripslashes_deep($_GET) : $_GET;
 		$this->post = (get_magic_quotes_gpc()) ? stripslashes_deep($_POST) : $_POST;
 		$this->cookie = (get_magic_quotes_gpc()) ? stripslashes_deep($_COOKIE) : $_COOKIE;
+		
+		$_REQUEST = $_GET + $_POST + $_COOKIE;
 
 		session_start();
 		$this->session = &$_SESSION;
@@ -68,6 +71,11 @@ class FARequest extends stdClass {
 		if (!isset(self::$instance)) self::$instance = new FARequest;
 		
 		return self::$instance;
+	}
+	
+	public function setArray($array) {
+	
+		foreach ($array as $key => $value) $this->$key = $value;
 	}
 }
 
@@ -179,7 +187,7 @@ function handle_request() {
 	page_init($registry, $request, $response);
 	
 	$handler = path()->getAction() . '_action';
-
+	
 	if (!function_exists($handler))
 		display_http_error('404', "Page not found");
 		
