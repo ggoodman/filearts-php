@@ -67,7 +67,7 @@ function create_action($registry, $request, $response) {
 		if ($user) {
 			
 			$request->session['user_id'] = $user->id;
-			if (isset($request->ref)) FAPath::redirect($request->ref);
+			if (isset($request->ref)) FAPath::setRedirect($request->ref);
 			else path('index.index')->redirectTo();
 		}
 		
@@ -86,7 +86,7 @@ function logout_action($registry, $request, $response) {
 	if ($request->visitor->isMember()) {
 	
 		unset($request->session['user_id']);
-		if (isset($request->ref)) FAPath::redirect($request->ref);
+		if (isset($request->ref)) FAPath::setRedirect($request->ref);
 		else path('index.index')->redirectTo();
 	}
 	
