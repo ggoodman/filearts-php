@@ -1,0 +1,19 @@
+form.fa-form {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+form.fa-form fieldset {
+	clear: both;
+}
+
+form.fa-form label {
+	display: block;
+	float: left;
+}
+
+label.fa-form-w25 {
+	width: 24%;
+}

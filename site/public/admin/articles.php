@@ -52,6 +52,9 @@ function article_form($request) {
 			), array(
 				'type' => 'submit',
 				'value' => 'Publish',
+			), array(
+				'type' => 'cancel',
+				'value' => 'Cancel',
 			)
 		),
 	));
@@ -105,6 +108,8 @@ function save_action($registry, $request, $response) {
 		
 		path('articles.view')->arg('id', $article->id)->redirectTo();
 	}
+	
+	$response->article_form_error = "Invalid article";
 	
 	$response->article_form = $form;
 	$response->view = 'edit';

@@ -20,10 +20,11 @@ class FADefaultPathBuilder implements FAPathBuilder {
 		$ret = $path->getBase();
 		$args = $path->getArgs();
 		
+		unset($args[FAPath::ACTION_VAR]);
+		
 		if ($path->getModule() != FAPath::DEFAULT_MODULE) $ret .= str_replace('.', '/', $path->getModule()) . '/';
 		if ($path->getAction() != FAPath::DEFAULT_ACTION) $args[FAPath::ACTION_VAR] = $path->getAction();
-		
-		$ret .= $path->getController() . '.php';
+		if ($path->getController() != FAPath::DEFAULT_CONTROLLER || isset($args[FAPath::ACTION_VAR])) $ret .= $path->getController() . '.php';
 		
 		if (!empty($args)) $ret .= '?' . http_build_query($args, '');
 		if ($path->getAnchor()) $ret .= '#' . $path->getAnchor();
@@ -243,7 +244,7 @@ class FAPath {
 	
 	public function backRef() {
 	
-		$this->arg(FAPath::BACKREF_VAR, path()->getPath());
+		$this->arg(FAPath::BACKREF_VAR, path()->args($this->args)->getPath());
 		
 		return $this;
 	}
