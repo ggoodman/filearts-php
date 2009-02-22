@@ -516,6 +516,16 @@ class FADeleteQuery extends FAQuery {
 		return $this;
 	}
 	
+	public function whereArray($array) {
+	
+		foreach ($array as $key => $value) {
+		
+			$this->where($key . '=?', $value);
+		}
+		
+		return $this;
+	}
+	
 	public function getSql() {
 
 		$sql = "DELETE FROM " . $this->table;

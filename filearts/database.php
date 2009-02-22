@@ -55,7 +55,7 @@ abstract class FADatabaseConnection {
 	
 	public function mergeArguments($sql, $args = NULL) {
 	
-		if ($args == NULL) return $sql;
+		if ($args === NULL) return $sql;
 		elseif (!is_array($args)) $args = array($args);
 		
 		$parts = preg_split('~\?~', $sql);

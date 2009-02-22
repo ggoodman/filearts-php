@@ -18,6 +18,8 @@ set_include_path(dirname(__FILE__)
 	. PATH_SEPARATOR . get_include_path()
 );
 
+class FAException extends Exception {}
+
 class FARegistry extends stdClass {
 
 	private function __construct() {

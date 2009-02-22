@@ -4,11 +4,7 @@
 
 <?php include('fragment.header.php'); ?>
 
-<?php if (isset($login_error)): ?>
-	<div class="form_error">
-	<?= $login_error ?>
-	</div>
-<?php endif; ?>
-<?= $login_form ?>
+<?php render('fragment.errors.php', array('errors' => form('login')->getErrors())); ?>
+<?= form('login') ?>
 
 <?php include('fragment.footer.php'); ?>

@@ -34,17 +34,18 @@ class User extends FAEntity implements FALinkable {
 			->arg('id', $this->id);
 	}
 
-	public function verify($credentials = array()) {
+	public static function verify($credentials = array()) {
 	
 		$credentials = array_merge(array(
 			'username' => NULL,
 			'password' => NULL,
 		), $credentials);
 		
-		$this->username = $credentials['username'];
-		$this->password = md5(SALT . $credentials['password']);
+		$credentials['password'] = md5(SALT . $credentials['password']);
 		
-		return $this->find();
+		$user = new User($credentials);
+		
+		return $user->find();
 	}
 }
 

@@ -4,6 +4,7 @@
 <head>
 <title><?= $title ?> - FileArts</title>
 <!--<link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/reset.css" />-->
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/filearts.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/style.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shCore.css"/>
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/sh/styles/shThemeDefault.css"/>

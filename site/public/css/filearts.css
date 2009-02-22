@@ -1,19 +1,126 @@
 form.fa-form {
 	width: 100%;
+	text-align: left;
 	margin: 0;
 	padding: 0;
 	border: 0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
 }
-
+form.fa-form .fa-form-element {
+	float: left;
+	clear: both;
+	margin: 0.25em 2% 0.25em 0;
+	padding: 0;
+	border: 0;
+	width: 48%;
+	overflow: none;
+}
+form.fa-form .fa-form-element-inline {
+	clear: none;
+	width: auto;
+	margin-right: 0.5em;
+}
+form.fa-form .fa-form-element-stacked {
+	clear: both;
+	margin: 0 0 4px 0;
+	padding: 0 4px;
+}
+form.fa-form .fa-form-element input,
+form.fa-form .fa-form-element textarea,
+form.fa-form .fa-form-element select {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
 form.fa-form fieldset {
 	clear: both;
+	margin: 0.5em 0;
+	padding: 0;
+	border: 0;
+}
+form.fa-form textarea {
+	height: 6em;
 }
 
 form.fa-form label {
-	display: block;
 	float: left;
+	margin: 0 0 0.2em 0;
+	padding: 0;
+} 
+form.fa-form span.fa-form-hint {
+	overflow: none;
+	line-height: 1.5em;
+}
+form.fa-form .fa-form-element-inline input,
+form.fa-form .fa-form-element-inline textarea,
+form.fa-form .fa-form-element-inline select {
+	width: auto;
+	margin: 0;
+	padding: 0;
+}
+form.fa-form .fa-form-element-inline label {
+	clear: both;
+}
+form.fa-form .fa-form-element-stacked input,
+form.fa-form .fa-form-element-stacked textarea,
+form.fa-form .fa-form-element-stacked select {
+	float: left;
+	width: auto;
+	margin: 0 0.25em 0 0;
+	padding: 0;
+}
+form.fa-form .fa-form-element-stacked label {
+	clear: both;
 }
 
-label.fa-form-w25 {
-	width: 24%;
+.fa-form-element.fa-form-w25 {
+	width: 23% !important;
+	clear: none !important;
+}
+.fa-form-element.fa-form-w33 {
+	width: 31% !important;
+	clear: none !important;
+}
+.fa-form-element.fa-form-w50 {
+	width: 48% !important;
+	clear: none !important;
+}
+.fa-form-element.fa-form-w66 {
+	width: 64% !important;
+	clear: none !important;
+}
+.fa-form-element.fa-form-w75 {
+	width: 73% !important;
+	clear: none !important;
+}
+.fa-form-element.fa-form-w100 {
+	width: 98% !important;
+}
+
+.fa-form-element.fa-form-nl {
+	clear: both !important;
+}
+
+/******/
+/*LOOK*/
+/******/
+
+form.fa-form fieldset {
+	border-top: 1px solid #CCC;
+}
+form.fa-form legend {
+	color: #000000;
+	font-size: 1.5em;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+form.fa-form textarea {
+	height: 12em;
+}
+
+form.fa-form span.fa-form-hint {
+	font-size: 0.8em;
+	color: #999999;
 }

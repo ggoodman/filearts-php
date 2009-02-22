@@ -4,7 +4,7 @@ require_once '../lib/bootstrap.php';
 
 function page_init($registry, $request, $response) {
 	
-	$response->topnav['news']->addClass('current');
+	$response->topnav['news']->class('current');
 }
 
 function comment_form($request) {

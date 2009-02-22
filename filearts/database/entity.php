@@ -112,6 +112,14 @@ abstract class FAEntity {
 		
 		return array_merge($this->saved, $this->dirty);
 	}
+	
+	public function delete() {
+	
+		FAPersistence::getDatabase($this)
+			->delete(FAPersistence::getTable($this)->getTableName())
+			->whereArray($this->getIdentity())
+			->execute();
+	}
 
 	public function find() {
 	
