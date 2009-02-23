@@ -124,3 +124,13 @@ form.fa-form span.fa-form-hint {
 	font-size: 0.8em;
 	color: #999999;
 }
+
+form.fa-form label:after {
+	content: ":";
+}
+form.fa-form .fa-form-element-required label:after {
+	content: '*:';
+}
+form.fa-form .fa-form-element-stacked label:after {
+	content: '';
+}

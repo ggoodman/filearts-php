@@ -34,7 +34,7 @@ class ArticleForm extends FAForm {
 }
 
 
-class FALoginValidator extends FAFormValidator {
+class LoginValidator extends FAFormValidator {
 
 	protected $user;
 	
@@ -90,9 +90,68 @@ class LoginForm extends FAForm {
 			->startSection()
 				->submit("Login");
 			
-		$this->login = new FALoginValidator;
+		$this->login = new LoginValidator;
 			
 		$this->addValidator($this->login);
+	}
+}
+
+class RegisterForm extends FAForm {
+
+	public function setUp() {
+	
+		$this
+			->action(path('member.create'))
+			->startSection('User Info')
+				->text('username', array(
+					'label' => "Username",
+					'hint' => "Your login name.",
+					'required' => true,
+					'validators' => array(
+						array(
+							'type' => 'regex',
+							'value' => '/^[a-z][_a-z0-9]{3,}$/i',
+							'message' => "Usernames must start with a letter, must be at least
+								4 characters long and must only contain letters, numbers and
+								underscores.",
+						),
+					),
+					'class' => 'fa-form-w25 fa-form-nl',
+					'filters' => array('trim'),
+				))
+				->text('name', array(
+					'label' => "Full name",
+					'hint' => "This is the name that other users will see.",
+					'required' => true,
+					'validators' => array(
+						array(
+							'type' => 'regex',
+							'value' => '/^\S.{4,}(?=\S)$/i',
+							'message' =>"Your name must be at least 4 characters long and cannot
+								begin or end with a space.",
+						),
+					),
+					'class' => 'fa-form-w33 fa-form-nl',
+					'filters' => array('trim'),
+				))
+				->text('password', array(
+					'label' => "Password",
+					'required' => true,
+					'class' => 'fa-form-w25 fa-form-nl',
+				))
+				->text('confirm', array(
+					'hint' => "Please confirm your password.",
+					'class' => 'fa-form-w25 fa-form-nl',
+					'validators' => array(
+						array(
+							'type' => 'compare',
+							'value' => 'password',
+							'message' => "Your passwords do not match.",
+						),
+					),
+				))
+			->startSection()
+				->submit("Create user");
 	}
 }
 

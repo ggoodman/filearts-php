@@ -4,11 +4,8 @@
 
 <?php include('fragment.header.php'); ?>
 
-<?php if (isset($register_error)): ?>
-	<div class="form_error">
-	<?= $register_error ?>
-	</div>
-<?php endif; ?>
-<?= $register_form ?>
+<?php render('fragment.errors.php', array('errors' => form('register')->getErrors())); ?>
+
+<?= form('register') ?>
 
 <?php include('fragment.footer.php'); ?>

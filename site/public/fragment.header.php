@@ -4,7 +4,6 @@
 <head>
 <title><?= $title ?> - FileArts</title>
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/reset.css" />
-<link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/filearts.css" />
 <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.6.0/build/base/base-min.css">
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/style.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/rte/jquery.rte.css" />
@@ -20,6 +19,8 @@
 <script type="text/javascript" src="<?= $base_url ?>js/rte/jquery.ocupload-1.1.4.js"></script>
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/theme/ui.base.css" />
 <link type="text/css" rel="stylesheet" href="<?= $base_url ?>js/theme/ui.theme.css" />
+<link type="text/css" rel="stylesheet" href="<?= $base_url ?>css/filearts.css" />
+<script type="text/javascript" src="<?= $base_url ?>js/filearts.js"></script>
 <script type="text/javascript">
 jQuery(function(){
 	$('.richedit').rte({

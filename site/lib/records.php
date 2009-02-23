@@ -123,7 +123,7 @@ class Article extends FAEntity implements FALinkable {
 	
 	public function getPath() {
 	
-		$path = new FAPath('blog.view');
+		$path = new FAPath('.blog.view');
 		
 		return $path
 			->arg('id', $this->id)

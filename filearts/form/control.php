@@ -59,6 +59,7 @@ class FAGenericBox extends FAFormControl {
 		return array(
 			'id' => self::generateId(),
 			'name' => '',
+			'label' => '',
 			'values' => array(),
 		);
 	}
@@ -114,12 +115,11 @@ class FAGenericButton extends FAFormControl {
 		
 		extract($options);
 		
-		return <<<EOF
-<div class="fa-form-element fa-form-element-inline $class">
-<input type="$type" value="$value" />
-</div>
-
-EOF;
+		$ret = "<div class=\"fa-form-element fa-form-element-inline $class\">\n";
+		$ret .= "<input type=\"$type\" value=\"$value\" />\n";
+		$ret .= "</div>\n";
+		
+		return $ret;
 	}
 }
 
@@ -142,12 +142,11 @@ class FACancelButton extends FAFormControl {
 		
 		extract($options);
 		
-		return <<<EOF
-<div class="fa-form-element fa-form-element-inline $class">
-<input type="button" value="$value" onclick="history.go(-1)" />
-</div>
-
-EOF;
+		$ret = "<div class=\"fa-form-element fa-form-element-inline $class\">\n";
+		$ret .= "<input type=\"button\" value=\"$value\" onclick=\"history.go(-1)\" />\n";
+		$ret .= "</div>\n";
+		
+		return $ret;
 	}
 }
 
@@ -157,6 +156,7 @@ class FAGenericInput extends FAFormControl {
 	
 		return array(
 			'id' => self::generateId(),
+			'label' => '',
 			'name' => '',
 			'value' => '',
 		);
@@ -166,39 +166,33 @@ class FAGenericInput extends FAFormControl {
 		
 		extract($this->getOptions());
 		
-		return <<<EOF
-<div class="fa-form-element $class">
-<label for="$id">$label</label>
-<input type="$type" name="$name" id="$id" value="$value" />
-<span class="fa-form-hint">$hint</span>
-</div>
-
-EOF;
+		$ret = "<div class=\"fa-form-element $class\">\n";
+		
+		if ($label) $ret .= "<label for=\"$id\">$label</label>\n";
+		
+		$ret .= "<input type=\"$type\" name=\"$name\" id=\"$id\" value=\"$value\" />\n";
+		$ret .= "<span class=\"fa-form-hint\">$hint</span>\n";
+		$ret .= "</div>\n";
+		
+		return $ret;
 	}
 }
 
-class FATextArea extends FAFormControl {
+class FATextArea extends FAGenericInput {
 
-	public function getDefaultOptions() {
-	
-		return array(
-			'id' => self::generateId(),
-			'name' => '',
-			'value' => '',
-		);
-	}
-	
 	public function __toString() {
 		
 		extract($this->getOptions());
 		
-		return <<<EOF
-<div class="fa-form-element $class">
-<label for="$id">$label</label>
-<textarea name="$name" id="$id">$value</textarea>
-</div>
-
-EOF;
+		$ret = "<div class=\"fa-form-element $class\">\n";
+		
+		if ($label) $ret .= "<label for=\"$id\">$label</label>\n";
+		
+		$ret .= "<textarea name=\"$name\" id=\"$id\">$value</textarea>\n";
+		$ret .= "<span class=\"fa-form-hint\">$hint</span>\n";
+		$ret .= "</div>\n";
+		
+		return $ret;
 	}
 }
 
@@ -207,7 +201,6 @@ class FAHiddenInput extends FAFormControl {
 	public function getDefaultOptions() {
 	
 		return array(
-			'id' => self::generateId(),
 			'name' => '',
 			'value' => '',
 		);

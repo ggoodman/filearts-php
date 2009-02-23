@@ -2,58 +2,9 @@
 
 require_once '../lib/bootstrap.php';
 
-function register_form($request) {
-
-	return new FAForm(array(
-		'action' => path('member.create'),
-		'method' => 'post',
-		'elements' => array(
-			array(
-				'type' => 'text',
-				'name' => 'username',
-				'title' => 'Username',
-				'label' => 'Username:',
-				'validators' => array(
-					array('type' => 'regex', 'value' => '/[^\s]/')
-				),
-			), array(
-				'type' => 'text',
-				'name' => 'name',
-				'title' => 'Write your full name as you wish others to see',
-				'label' => 'Full Name:',
-				'validators' => array(
-					array('type' => 'regex', 'value' => '/[^\s]/')
-				),
-			), array(
-				'type' => 'password',
-				'name' => 'password',
-				'title' => 'Password',
-				'label' => 'Password:',
-				'validators' => array(
-					array('type' => 'regex', 'value' => '/[^\s]/')
-				),
-			), array(
-				'type' => 'password',
-				'name' => 'confirm',
-				'title' => 'Confirm',
-				'label' => 'Confirm Password:',
-				'validators' => array(
-					array('type' => 'regex', 'value' => '/[^\s]/')
-				),
-			), array(
-				'type' => 'submit',
-				'value' => 'Register',
-			)
-		),
-		'validators' => array(
-			array('type' => 'equal', 'value' => array('password', 'confirm')),
-		),
-	));
-}
-
 function create_action($registry, $request, $response) {
 	
-	$form = register_form($request);
+	$form = form('register');
 
 	if ($form->isValid($request->post)) {
 		
@@ -95,7 +46,6 @@ function logout_action($registry, $request, $response) {
 
 function register_action($registry, $request, $response) {
 
-	$response->register_form = register_form($request);
 }
 
 ?>

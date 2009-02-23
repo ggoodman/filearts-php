@@ -22,7 +22,7 @@ class FAFormValidator {
 	public function validate($values) {
 	}
 
-	public function validateContainer(FAFormContainer $container, $values) {
+	public function validateContainer(FAFormContainer $container, &$values) {
 	
 		foreach ($container->getChildren() as $child) {
 		
@@ -40,7 +40,7 @@ class FAFormValidator {
 		return empty($this->errors);
 	}
 	
-	public function validateControl(FAFormControl $control, $values) {
+	public function validateControl(FAFormControl $control, &$values) {
 	
 		$options = $control->getOptions();
 		$name = $control->getName();
@@ -56,7 +56,39 @@ class FAFormValidator {
 					$control,
 					ucfirst(str_replace('_', ' ', $name)) . " is a required field."
 				);
+				
+				// The field failed the required validator, no point going further
+				return;
 			}
+		}
+		
+		// No need for additional validators
+		if (!isset($values[$name])) return;
+		
+		// Run additional validators
+		foreach ($options['validators'] as $validator) {
+			
+			extract($validator);
+			
+			switch ($type) {
+				case 'regex':
+					if (!preg_match($value, $values[$name]))
+						$this->addError($control, $message);
+					break;
+				case 'compare':
+					if (!isset($values[$value]) || $values[$value] != $values[$name])
+						$this->addError($control, $message);
+					break;
+				default:
+					throw new FAException("Unknown validator: $type");
+			}
+		}
+		
+		foreach ($options['filters'] as $filter) {
+			
+			if (!is_callable($filter)) throw new FAException("No such filter: $filter");
+			
+			$values[$name] = $filter($values[$name]);
 		}
 	}
 }
